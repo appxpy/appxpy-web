@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  web:
+    container_name: web-appxpy.com
+    image: appxpy-com:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    expose:
+      - 3000
+    networks:
+      - proxy
+      - default
+    command: "npm run preview -- --port 3000 --host"
+networks:
+  proxy:
+    external: true
