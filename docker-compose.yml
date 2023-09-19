@@ -13,6 +13,11 @@ services:
       - proxy
       - default
     command: "npm run preview -- --port 3000 --host"
+    environment:
+      - VIRTUAL_HOST=appxpy.com
+      - VIRTUAL_PORT=3000
+      - NETWORK=proxy
+      - LETSENCRYPT_HOST=appxpy.com
 networks:
   proxy:
     external: true
