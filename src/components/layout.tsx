@@ -64,7 +64,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           />
         </Canvas>
         <Header />
-        <main className="fixed inset-0 pt-24 pb-6 px-6 font-inter font-normal md:pt-32 md:pb-12 md:px-12 select-none">
+        <main className="absolute inset-0 pt-24 pb-6 px-6 font-inter font-normal md:pt-32 md:pb-12 md:px-12 select-none">
           <div className="flex flex-col w-full h-full">{children}</div>
         </main>
       </Loader>

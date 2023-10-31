@@ -46,7 +46,7 @@ const Links: React.FC<LinksProps> = ({ id, title, children }: LinksProps) => {
         return (
           <h2
             key={index}
-            className="m-0 text-right text-transparent stroke tracking-[6px] opacity-70 lg:uppercase lg:text-start lg:overflow-hidden lg:h-[calc(4ch+32px)] lg:[writing-mode:vertical-lr] lg:rotate-180 text-[32px] font-bold lg:hidden"
+            className="inline-block m-0 text-right text-transparent stroke tracking-[6px] opacity-70 lg:uppercase lg:text-start lg:overflow-hidden lg:h-[calc(4ch+32px)] lg:tracking-wider text-[32px] font-bold lg:hidden"
           >
             {value.text}
           </h2>
@@ -55,7 +55,7 @@ const Links: React.FC<LinksProps> = ({ id, title, children }: LinksProps) => {
       return (
         <h1
           key={index}
-          className="m-0 text-right text-transparent stroke tracking-[6px] opacity-70 lg:uppercase lg:text-start lg:overflow-hidden lg:h-[calc(4ch+32px)] lg:[writing-mode:vertical-lr] lg:rotate-180 text-[46px] lg:text-[72px] font-bold"
+          className="m-0 text-right text-transparent stroke tracking-[6px] opacity-70 lg:uppercase lg:text-start lg:overflow-hidden lg:w-[calc(4ch+32px)] lg:-rotate-90 lg:-translate-y-1/2 lg:-translate-x-1/2 text-[46px] lg:text-[72px] font-bold"
         >
           {value.text}
         </h1>
@@ -68,7 +68,7 @@ const Links: React.FC<LinksProps> = ({ id, title, children }: LinksProps) => {
       className="flex w-full flex-nowrap flex-row items-center justify-end"
     >
       <div className="flex flex-col flex-nowrap items-end justify-center gap-6 lg:flex-row">
-        <div className="flex flex-col flex-nowrap select-none">
+        <div className="flex lg:w-6 flex-col flex-nowrap select-none">
           {multilineTitle}
         </div>
         <div className="w-[180px] opacity-50 h-px bg-primary rotate-[175deg] lg:w-px lg:h-[140px]"></div>
