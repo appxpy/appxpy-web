@@ -13,7 +13,7 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      maxParallelFileOps: 1,
+      maxParallelFileOps: 4,
       cache: false,
       output: {
         sourcemap: false,
