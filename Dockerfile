@@ -10,6 +10,8 @@ ENV PATH /usr/node_modules/.bin:$PATH
 
 COPY . .
 
+ENV NODE_OPTIONS --max-old-space-size=32768
+
 RUN npm run build
 
 EXPOSE 3000
