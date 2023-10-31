@@ -29,7 +29,7 @@ function App() {
 
   return (
     <>
-      <Layout backgroundSrc={"/background.png"}>
+      <Layout>
         <Section id="titles">
           <Title>
             パンケビッチ・ジョージ

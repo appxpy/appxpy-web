@@ -3,7 +3,7 @@ import { Logo } from "./nav";
 
 export const Header: React.FC = () => {
   return (
-    <header className="fixed w-full z-10 text-primary">
+    <header className="fixed w-full z-10 top-0 text-primary">
       <div className="flex justify-between items-center px-6 pt-6 pb-0 xs:landscape:px-12">
         <div className="flex items-center">
           <a href="https://appxpy.com">
