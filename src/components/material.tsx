@@ -129,8 +129,8 @@ export const WaterDribblingMaterial = ({
     updateDataTexture();
   });
 
-  const dataTextureWidth = 60;
-  const maxDst = 5;
+  const dataTextureWidth = 80;
+  const maxDst = 6;
   const dataTextureHeight = Math.ceil(dataTextureWidth * (2160 / 3840));
 
   const dataTextureSize = dataTextureHeight * dataTextureWidth;
@@ -166,10 +166,10 @@ export const WaterDribblingMaterial = ({
     for (
       let i = 0;
       i < shaderRef.current.uniforms.dataTexture.value.image.data.length;
-      i += 3
+      i += 4
     ) {
-      shaderRef.current.uniforms.dataTexture.value.image.data[i] *= 0.8;
-      shaderRef.current.uniforms.dataTexture.value.image.data[i + 1] *= 0.8;
+      shaderRef.current.uniforms.dataTexture.value.image.data[i] *= 0.9;
+      shaderRef.current.uniforms.dataTexture.value.image.data[i + 1] *= 0.9;
     }
     // console.log(shaderRef.current.uniforms.dataTexture.value.image.data[0]);
     const gridMouseX = dataTextureWidth * mouse.x;
@@ -187,9 +187,9 @@ export const WaterDribblingMaterial = ({
           const power = maxDst / Math.sqrt(distance);
 
           shaderRef.current.uniforms.dataTexture.value.image.data[index] +=
-            40 * mouse.vX * power;
+            100 * mouse.vX * power;
           shaderRef.current.uniforms.dataTexture.value.image.data[index + 1] -=
-            40 * mouse.vY * power;
+            100 * mouse.vY * power;
         }
       }
     }
