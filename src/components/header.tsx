@@ -12,7 +12,7 @@ export const Header: React.FC = () => {
         </div>
         <a
           className="flex items-center gap-1 group cursor-pointer"
-          href={"https://disk.yandex.ru/i/40rxu92OfZlU3w"}
+          href={"https://disk.yandex.ru/d/vvh1lw85_KdQ5Q"}
           target="_blank"
         >
           {/* <div className="flex justify-center items-center group cursor-pointer w-12 h-12">
