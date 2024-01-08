@@ -3,14 +3,12 @@ version: "3.8"
 services:
   web:
     container_name: web-appxpy.com
-    image: appxpy-com:latest
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: {{ env.FRONTEND_IMAGE }}
+    restart: always
     expose:
       - 3000
     networks:
-      - proxy
+#      - proxy
       - default
     command: "npm run preview -- --port 3000 --host"
     environment:
@@ -18,6 +16,6 @@ services:
       - VIRTUAL_PORT=3000
       - NETWORK=proxy
       - LETSENCRYPT_HOST=appxpy.com
-networks:
-  proxy:
-    external: true
+#networks:
+#  proxy:
+#    external: true
