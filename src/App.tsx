@@ -8,6 +8,8 @@ function App() {
   const date = new Date();
   const weekDay = (() => {
     switch (date.getDay()) {
+      case 0:
+        return "日曜日";
       case 1:
         return "月曜日";
       case 2:
@@ -20,8 +22,6 @@ function App() {
         return "金曜日";
       case 6:
         return "土曜日";
-      case 7:
-        return "日曜日";
       default:
         return "impossible";
     }

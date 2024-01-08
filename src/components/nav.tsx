@@ -12,17 +12,6 @@ export const Logo: React.FC<LogoProps> = ({ ...props }: LogoProps) => {
       className="relative flex items-center justify-center group"
       style={{ width: hw, height: hw }}
     >
-      {/* <div
-        style={{
-          WebkitMask: `url("/appxpy-logo.svg") center no-repeat`,
-          mask: `url("/appxpy-logo.svg") center no-repeat`,
-          width: hw,
-          height: hw,
-        }}
-        className="bg-primary group-hover:mix-blend-overlay"
-      >
-        <i className="block w-full h-full"></i>
-      </div> */}
       <LogoSVG
         width={hw}
         height={hw}

@@ -1,4 +1,4 @@
-import { PerspectiveCamera } from "@react-three/drei";
+import { PerspectiveCamera} from "@react-three/drei";
 import { useEffect, useRef } from "react";
 import {
   Mesh,
@@ -102,10 +102,10 @@ export const Scene = ({ image, opacityMask, normalMap }: SceneProps) => {
 
     // const scroll = (e: MouseEvent) => {
     //   if (!cameraRef.current) return;
-
+    //
     //   cameraRef.current.position.x -= e.deltaY / window.innerHeight;
     //   console.log(cameraRef.current.position.x, e.deltaY);
-
+    //
     //   // prevent scrolling beyond a min/max value
     //   cameraRef.current.position.clampScalar(0, 10);
     // };
@@ -150,7 +150,6 @@ export const Scene = ({ image, opacityMask, normalMap }: SceneProps) => {
           direction={0}
         />
       </mesh>
-      {/* <OrbitControls /> */}
     </>
   );
 };

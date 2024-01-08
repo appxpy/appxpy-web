@@ -28,20 +28,21 @@ const fragmentShader = glsl`
     varying vec4 textureCoordRipple;
 
     void main() {
-    	vec2 texCoord = textureCoord.xy;
+      vec2 texCoord = textureCoord.xy;
       // texCoord = (texCoord - vec2(0.5)) * resolution.zw + vec2(0.5);
 
-    	float mask = texture2D(maskTexture, texCoord).r;
-    	vec3 n1 = texture2D(normalTexture, textureCoordRipple.xy).xyz * 2.0 - 1.0;
-    	vec3 n2 = texture2D(normalTexture, textureCoordRipple.zw).xyz * 2.0 - 1.0;
-    	vec3 normal = normalize(vec3(n1.xy + n2.xy, n1.z));
+      float mask = texture2D(maskTexture, texCoord).r;
+      vec3 n1 = texture2D(normalTexture, textureCoordRipple.xy).xyz * 2.0 - 1.0;
+      vec3 n2 = texture2D(normalTexture, textureCoordRipple.zw).xyz * 2.0 - 1.0;
+      vec3 normal = normalize(vec3(n1.xy + n2.xy, n1.z));
+    	
       // dataTexture.a = 1.0;
       vec4 offset = texture2D(dataTexture, texCoord);
       
       texCoord -= offset.r * offset.g;
-    	texCoord.xy += normal.xy * ripplestrength * ripplestrength * mask;
+      texCoord.xy += normal.xy * ripplestrength * ripplestrength * mask;
 
-    	vec3 colorRGB = ACESFilm(texture2D(framebuffer, texCoord).rgb);
+      vec3 colorRGB = ACESFilm(texture2D(framebuffer, texCoord).rgb);
       vec4 color = vec4(colorRGB.r, colorRGB.g, colorRGB.b, 1.0);
 
       // vec2 newUV = (texCoord - vec2(0.5))/scaleWindow + vec2(0.5);
@@ -80,15 +81,15 @@ void main() {
   gl_Position = modelViewProjectionMatrix * vec4(position, 1.0);
 
   textureCoord.xy = uv;
-  
+
   float piFrac = 0.78539816339744830961566084581988 * 0.5;
   float pi = 3.141;
-  
+
   vec2 coordsRotated = textureCoord.xy;
   vec2 coordsRotated2 = textureCoord.xy * 1.777;
-  
+
   vec2 scroll = rotate(vec2(0, 1), direction) * scrollSpeed * scrollSpeed * time;
-  
+
   textureCoordRipple.xy = coordsRotated + time * animationSpeed * animationSpeed + scroll;
   textureCoordRipple.zw = coordsRotated2 - time * animationSpeed * animationSpeed + scroll;
   textureCoordRipple *= scale;
@@ -171,10 +172,8 @@ export const WaterDribblingMaterial = ({
       shaderRef.current.uniforms.dataTexture.value.image.data[i] *= 0.9;
       shaderRef.current.uniforms.dataTexture.value.image.data[i + 1] *= 0.9;
     }
-    // console.log(shaderRef.current.uniforms.dataTexture.value.image.data[0]);
     const gridMouseX = dataTextureWidth * mouse.x;
     const gridMouseY = dataTextureHeight * (1 - mouse.y);
-    // alert(gridMouseX);
 
     for (let i = 0; i < dataTextureWidth; i++) {
       for (let j = 0; j < dataTextureHeight; j++) {
@@ -187,9 +186,9 @@ export const WaterDribblingMaterial = ({
           const power = maxDst / Math.sqrt(distance);
 
           shaderRef.current.uniforms.dataTexture.value.image.data[index] +=
-            100 * mouse.vX * power;
+            10 * Math.min(mouse.vX, 0.01) * power;
           shaderRef.current.uniforms.dataTexture.value.image.data[index + 1] -=
-            100 * mouse.vY * power;
+            10 * Math.min(mouse.vY, 0.01) * power;
         }
       }
     }
@@ -264,7 +263,6 @@ export const WaterDribblingMaterial = ({
       normalTexture: { value: normalMap },
       ripplestrength: { value: ripplestrength },
       dataTexture: { value: dataTexture },
-      // resolution: { value: new Vector4(1) },
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
