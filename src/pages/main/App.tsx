@@ -39,7 +39,7 @@ function App() {
           <Subtitle>
             <span>{date.getFullYear()}</span>
             <span>/</span>
-            <span>{String(date.getMonth()).padStart(2, "0")}</span>
+            <span>{String(date.getMonth() + 1).padStart(2, "0")}</span>
             <span>/</span>
             <span>{weekDay}</span>
           </Subtitle>
