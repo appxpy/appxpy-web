@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import { Texture } from "three";
+import { extend } from "@react-three/fiber";
+
+extend({ Texture })
 
 const ImageLoader = (
   imageUrl: string,

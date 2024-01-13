@@ -30,7 +30,7 @@ export const Loader = ({
       const step = (newProgress - currentProgress) / 100;
       let current = currentProgress;
 
-      const interval = setInterval(() => {
+      const interval = window.setInterval(() => {
         current += step;
         setProgress(current);
 

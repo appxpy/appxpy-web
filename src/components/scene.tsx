@@ -1,11 +1,10 @@
-import { PerspectiveCamera} from "@react-three/drei";
+import { PerspectiveCamera} from "@react-three/drei/core/PerspectiveCamera";
 import { useEffect, useRef } from "react";
-import {
-  Mesh,
-  PerspectiveCamera as PerspectiveCameraImpl,
-  Texture,
-} from "three";
+import { Mesh, Texture, PerspectiveCamera as PerspectiveCameraImpl } from "three";
 import { WaterDribblingMaterial } from "./material";
+import {extend} from "@react-three/fiber";
+
+extend({ Mesh, Texture, PerspectiveCameraImpl})
 
 type SceneProps = {
   image: Texture;

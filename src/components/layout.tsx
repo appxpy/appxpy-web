@@ -1,10 +1,12 @@
-import { Canvas } from "@react-three/fiber";
+import {Canvas, extend} from "@react-three/fiber";
 import React, { useState } from "react";
 import { ACESFilmicToneMapping, RepeatWrapping, SRGBColorSpace } from "three";
 import { Header } from "./header";
 import ImageLoader from "./imageloader";
 import { Loader } from "./loader";
 import { Scene } from "./scene";
+
+extend({ ACESFilmicToneMapping, RepeatWrapping, SRGBColorSpace })
 
 interface LayoutProps {
   children?: React.ReactNode;

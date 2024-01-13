@@ -1,7 +1,7 @@
 import { useFrame } from "@react-three/fiber";
 import glsl from "glslify";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { DataTexture, FloatType, RGBAFormat, Texture } from "three";
+import { DataTexture, Texture, FloatType, RGBAFormat } from "three";
 
 const fragmentShader = glsl`
     vec3 ACESFilm(vec3 x)
@@ -214,7 +214,7 @@ export const WaterDribblingMaterial = ({
         prevY = y / window.innerHeight;
       }
       clearTimeout(timer);
-      timer = setTimeout(mouseStopped, delay);
+      timer = window.setTimeout(mouseStopped, delay);
 
       const mouseX = (x * (3840 / window.innerWidth)) / 3840;
       const mouseY = (y * (2160 / window.innerHeight)) / 2160;

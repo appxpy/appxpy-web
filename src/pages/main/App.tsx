@@ -1,8 +1,8 @@
-import Layout from "./components/layout";
-import { Links, LinksItem } from "./components/links";
-import { Section } from "./components/section";
-import Subtitle from "./components/subtitle";
-import Title from "./components/title";
+import Layout from "../../components/layout.tsx";
+import { Links, LinksItem } from "../../components/links.tsx";
+import { Section } from "../../components/section.tsx";
+import Subtitle from "../../components/subtitle.tsx";
+import Title from "../../components/title.tsx";
 
 function App() {
   const date = new Date();
