@@ -29,7 +29,7 @@ function App() {
 
   return (
     <>
-      <Layout>
+      <Layout wallpaperMode={false}>
         <Section id="titles">
           <Title>
             パンケビッチ・ジョージ

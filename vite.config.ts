@@ -17,6 +17,7 @@ export default defineConfig({
       rollupOptions: {
         input: {
           main: resolvePath(__dirname, 'index.html'),
+          wallpaper: resolvePath(__dirname, 'wallpaper/index.html'),
           error404: resolvePath(__dirname, '404.html')
         },
         output:{

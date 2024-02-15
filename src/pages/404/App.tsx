@@ -3,7 +3,7 @@ import Layout from "../../components/layout.tsx";
 function App() {
   return (
     <>
-      <Layout>
+      <Layout wallpaperMode={false}>
         <div className={"flex justify-center items-center w-full h-full"}>
           <svg className="absolute w-4/5 h-full [min-width:280px] [max-width:600px]" viewBox="0 0 540 343" fill="none" xmlns="http://www.w3.org/2000/svg">
             <g filter="url(#filter0_f_311_66)">
