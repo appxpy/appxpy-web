@@ -17,8 +17,7 @@ export const Header: React.FC<HeaderProps> = (props) => {
         { !props.wallpaperMode ?
           <a
               className="flex items-center gap-1 group cursor-pointer"
-              href={"https://disk.yandex.ru/d/vvh1lw85_KdQ5Q"}
-              target="_blank"
+              href={"https://appxpy.com/%D0%9F%D0%B0%D0%BD%D0%BA%D0%B5%D0%B2%D0%B8%D1%87%20%D0%93%D0%B5%D0%BE%D1%80%D0%B3%D0%B8%D0%B9%20%D0%9C%D0%B0%D0%BA%D1%81%D0%B8%D0%BC%D0%BE%D0%B2%D0%B8%D1%87.pdf"}
           >
           <span
               className="m-0 p-0 text-primary group-hover:opacity-60 text-base font-medium leading-4 flex items-center no-underline lowercase select-none transition-opacity duration-300">

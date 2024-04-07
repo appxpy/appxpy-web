@@ -130,8 +130,8 @@ export const WaterDribblingMaterial = ({
     updateDataTexture();
   });
 
-  const dataTextureWidth = 80;
-  const maxDst = 6;
+  const dataTextureWidth = 160;
+  const maxDst = 12;
   const dataTextureHeight = Math.ceil(dataTextureWidth * (2160 / 3840));
 
   const dataTextureSize = dataTextureHeight * dataTextureWidth;
@@ -169,8 +169,8 @@ export const WaterDribblingMaterial = ({
       i < shaderRef.current.uniforms.dataTexture.value.image.data.length;
       i += 4
     ) {
-      shaderRef.current.uniforms.dataTexture.value.image.data[i] *= 0.9;
-      shaderRef.current.uniforms.dataTexture.value.image.data[i + 1] *= 0.9;
+      shaderRef.current.uniforms.dataTexture.value.image.data[i] *= 0.94;
+      shaderRef.current.uniforms.dataTexture.value.image.data[i + 1] *= 0.94;
     }
     const gridMouseX = dataTextureWidth * mouse.x;
     const gridMouseY = dataTextureHeight * (1 - mouse.y);
@@ -205,6 +205,21 @@ export const WaterDribblingMaterial = ({
     const mouseStopped = () => {
       setMouse({ ...mouse, vX: 0, vY: 0 });
     };
+
+    // const onClick = () => {
+    //   for (
+    //       let i = 0;
+    //       i < shaderRef.current?.uniforms.dataTexture.value.image.data.length;
+    //       i += 4
+    //   ) {
+    //     if (shaderRef.current) {
+    //       shaderRef.current.uniforms.dataTexture.value.image.data[i] = Math.random() * 5;
+    //       shaderRef.current.uniforms.dataTexture.value.image.data[i + 1] = Math.random() * 5;
+    //       shaderRef.current.uniforms.dataTexture.value.image.data[i + 2] = 0;
+    //       shaderRef.current.uniforms.dataTexture.value.image.data[i + 3] = 0;
+    //     }
+    //   }
+    // }
 
     const onMove = (x: number, y: number) => {
       if (!prevX) {
@@ -241,10 +256,12 @@ export const WaterDribblingMaterial = ({
     const touchMoveEvent = (e: TouchEvent) => {
       onMove(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
     };
+    // window.addEventListener("touchend", onClick);
     window.addEventListener("mousemove", mouseMoveEvent, { passive: true });
     window.addEventListener("touchmove", touchMoveEvent, { passive: true });
 
     return () => {
+      // window.removeEventListener("touchend", onClick)
       window.removeEventListener("mousemove", mouseMoveEvent);
       window.removeEventListener("touchmove", touchMoveEvent);
     };
