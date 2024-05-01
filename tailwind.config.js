@@ -1,37 +1,23 @@
 /** @type {import('tailwindcss').Config} */
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires, no-undef
-const defaultTheme = require("tailwindcss/defaultTheme");
-
 export default {
-  content: ["./src/**/*.{js,jsx,ts,tsx}"],
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
   theme: {
-    extend: {
-      colors: {
-        primary: "#EDF2FB",
-        secondary: "#E2EAFC",
-      },
-      animation: {
-        text: "text 5s ease infinite",
-      },
-      keyframes: {
-        text: {
-          "0%, 100%": {
-            "background-size": "200% 200%",
-            "background-position": "left center",
-          },
-          "50%": {
-            "background-size": "200% 200%",
-            "background-position": "right center",
-          },
-        },
-      },
-    },
     screens: {
-      xs: "475px",
-      ...defaultTheme.screens,
+        'mm': '425px',
+        'sm': '640px',
+        'md': '768px',
+        'lg': '1024px',
+        'xl': '1280px',
     },
+    fontFamily: {
+      primary: "'ABC Diatype', sans-serif",
+      variable: "'ABC Diatype Plus Variable', sans-serif"
+    },
+    extend: {},
   },
-
   plugins: [],
-};
+}
+
