@@ -66,9 +66,9 @@ void main() {
         uv.y += 0.6 / i * cos(i * 1.4 * uv.x + slowedTime);
     }
 
-    float noise = noise3(gl_FragCoord.x*0.000001, gl_FragCoord.y*0.000001, uTime * 2e-14) * .2;
+    float noise = noise3(gl_FragCoord.x*0.000001, gl_FragCoord.y*0.000001, uTime * 2e-14) * .4;
 
     float luminosity = abs(sin(slowedTime-uv.y-uv.x));
-    gl_FragColor.rgb = vec3(min(.04/luminosity + min(noise * (.04/luminosity), .1), 1.0));
+    gl_FragColor.rgb = vec3(min(.04/luminosity + min(noise * (.06/luminosity), .1), 1.0));
     gl_FragColor.a = 1.0;
 }

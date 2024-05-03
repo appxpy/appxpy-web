@@ -8,7 +8,7 @@ export const Logo: React.FC<LogoProps> = ({ ...props }: LogoProps) => {
   const hw = `${props.size}px`;
   return (
     <div
-      className={"relative flex items-center justify-center"}
+      className={"relative flex items-center justify-center pointer-events-auto"}
       style={{ width: hw, height: hw }}
     >
       <svg width={hw} height={hw} viewBox="0 0 1500 1500" fill="none" xmlns="http://www.w3.org/2000/svg" className="">
