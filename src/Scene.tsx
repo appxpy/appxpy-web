@@ -2,7 +2,6 @@ import Plane from './components/Plane'
 
 import React, { FunctionComponent } from 'react';
 import {Dimensions} from "./main";
-import {Lightformer} from "@react-three/drei";
 
 interface SceneProps {
     dimensions: Dimensions

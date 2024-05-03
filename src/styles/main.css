@@ -155,12 +155,16 @@
   font-display: swap;
 }
 
+html {
+  overscroll-behavior: none;
+  overflow: hidden;
+}
 
 body {
   font-family: 'ABC Diatype Plus Variable', sans-serif;
   font-weight: normal;
   position: relative;
-  background: black;
+  background: #0c0c0c;
   color: white;
 }
 

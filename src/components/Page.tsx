@@ -60,9 +60,9 @@ const Page: FunctionComponent = (props) => {
     }, [])
 
   return (
-      <div className="inset-0 fixed overflow-hidden touch-auto overscroll-none">
+      <div className="inset-0 fixed overflow-hidden">
           <Canvas
-              className={"touch-auto"}
+              className={"fixed inset-0 w-full h-full overflow-hidden touch-auto"}
               dpr={[1, 2]}
               gl={{
                   antialias: true,
