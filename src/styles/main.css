@@ -1,0 +1,175 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'ABC Diatype';
+  src: url('/ABCDiatype-BlackItalic.woff2') format('woff2'),
+  url('/ABCDiatype-BlackItalic.woff') format('woff');
+  font-weight: 950;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ABC Diatype';
+  src: url('/ABCDiatype-BoldItalic.woff2') format('woff2'),
+  url('/ABCDiatype-BoldItalic.woff') format('woff');
+  font-weight: bold;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ABC Diatype';
+  src: url('/ABCDiatype-Black.woff2') format('woff2'),
+  url('/ABCDiatype-Black.woff') format('woff');
+  font-weight: 950;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ABC Diatype';
+  src: url('/ABCDiatype-HeavyItalic.woff2') format('woff2'),
+  url('/ABCDiatype-HeavyItalic.woff') format('woff');
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ABC Diatype';
+  src: url('/ABCDiatype-Heavy.woff2') format('woff2'),
+  url('/ABCDiatype-Heavy.woff') format('woff');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ABC Diatype';
+  src: url('/ABCDiatype-Bold.woff2') format('woff2'),
+  url('/ABCDiatype-Bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ABC Diatype';
+  src: url('/ABCDiatype-MediumItalic.woff2') format('woff2'),
+  url('/ABCDiatype-MediumItalic.woff') format('woff');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ABC Diatype Plus Variable';
+  src: url('/ABCDiatypePlusVariable.woff2') format('woff2'),
+  url('/ABCDiatypePlusVariable.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ABC Diatype';
+  src: url('/ABCDiatype-Medium.woff2') format('woff2'),
+  url('/ABCDiatype-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ABC Diatype';
+  src: url('/ABCDiatype-ThinItalic.woff2') format('woff2'),
+  url('/ABCDiatype-ThinItalic.woff') format('woff');
+  font-weight: 100;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ABC Diatype';
+  src: url('/ABCDiatype-LightItalic.woff2') format('woff2'),
+  url('/ABCDiatype-LightItalic.woff') format('woff');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ABC Diatype';
+  src: url('/ABCDiatype-Thin.woff2') format('woff2'),
+  url('/ABCDiatype-Thin.woff') format('woff');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ABC Diatype';
+  src: url('/ABCDiatype-Ultra.woff2') format('woff2'),
+  url('/ABCDiatype-Ultra.woff') format('woff');
+  font-weight: 1000;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ABC Diatype';
+  src: url('/ABCDiatype-Regular.woff2') format('woff2'),
+  url('/ABCDiatype-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ABC Diatype';
+  src: url('/ABCDiatype-UltraItalic.woff2') format('woff2'),
+  url('/ABCDiatype-UltraItalic.woff') format('woff');
+  font-weight: 1000;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ABC Diatype';
+  src: url('/ABCDiatype-RegularItalic.woff2') format('woff2'),
+  url('/ABCDiatype-RegularItalic.woff') format('woff');
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ABC Diatype';
+  src: url('/ABCDiatype-Light.woff2') format('woff2'),
+  url('/ABCDiatype-Light.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+body {
+  font-family: 'ABC Diatype Plus Variable', sans-serif;
+  font-weight: normal;
+  position: relative;
+  background: black;
+  color: white;
+}
+
+.main {
+  width: 100%;
+  height: 100%;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+}
