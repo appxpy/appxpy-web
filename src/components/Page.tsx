@@ -1,4 +1,4 @@
-import React, {FunctionComponent, useEffect, useState} from 'react';
+import React, {FunctionComponent, useEffect, useRef, useState} from 'react';
 import {Logo} from "./Logo";
 import {Dimensions} from "../main";
 import {ACESFilmicToneMapping, SRGBColorSpace} from "three";
@@ -15,8 +15,75 @@ const Page: FunctionComponent = (props) => {
         aspectHW: window.innerHeight / window.innerWidth,
         aspect: Math.max(window.innerWidth / window.innerHeight, window.innerHeight / window.innerWidth)
     });
+    const wasCalled = useRef(false);
+
+    const frames: {s: string, delay?: number, replace?: boolean}[] = [
+        {s: "Pankevich\u205fGeorge", replace: true},
+        {s: "Pankevich#George", replace: true, delay: 50},
+        {s: "Pank#vich*George", replace: true, delay: 50},
+        {s: "Pank*vich*Geor#e", replace: true, delay: 50},
+        {s: "#ank*vich*Geor*e", replace: true, delay: 50},
+        {s: "*#nk*vich*Geor*e", replace: true, delay: 50},
+        {s: "**#k*vich*Geor*e", replace: true, delay: 50},
+        {s: "***k*vich*Ge#r*e", replace: true, delay: 50},
+        {s: "***k*v#ch*Ge*r*e", replace: true, delay: 50},
+        {s: "***#*v*ch*Ge*r*e", replace: true, delay: 50},
+        {s: "*****v*c#*Ge*r*e", replace: true, delay: 50},
+        {s: "*****v*c**#e*r*e", replace: true, delay: 50},
+        {s: "*****v*#***e*r*e", replace: true, delay: 50},
+        {s: "*****#*****e*r*e", replace: true, delay: 50},
+        {s: "***********#*r*e", replace: true, delay: 50},
+        {s: "*************r*#", replace: true, delay: 50},
+        {s: "*************#**", replace: true, delay: 50},
+        {s: "****************", replace: true, delay: 1000},
+        {s: "*******x*******", replace: true, delay: 100},
+        {s: "* ****pxp**** *", replace: true, delay: 100},
+        {s: "*  **ppxpy**  *", replace: true, delay: 100},
+        {s: "*   appxpy    *", replace: true, delay: 100},
+        {s: "appxpy", replace: true, delay: 1000},
+        {s: "\u205f", replace: true, delay: 100},
+        {s: "appxpy", replace: true, delay: 70},
+        {s: "\u205f", replace: true, delay: 70},
+        {s: "appxpy", replace: true, delay: 50},
+        {s: "\u205f", replace: true, delay: 50},
+        {s: "appxpy", replace: true, delay: 30},
+        {s: "\u205f", replace: true, delay: 30},
+        {s: "appxpy", replace: true, delay: 10},
+        {s: "\u205f", replace: true, delay: 1000},
+        {s: "P", delay: 100},
+        {s: "a", delay: 100},
+        {s: "n", delay: 100},
+        {s: "k", delay: 100},
+        {s: "e", delay: 100},
+        {s: "v", delay: 100},
+        {s: "i", delay: 100},
+        {s: "c", delay: 100},
+        {s: "h", delay: 100},
+        {s: "\u205f", delay: 100},
+        {s: "G", delay: 100},
+        {s: "e", delay: 100},
+        {s: "o", delay: 100},
+        {s: "r", delay: 100},
+        {s: "g", delay: 100},
+        {s: "e", delay: 2000},
+    ]
+
+
+    const changeTitle = (frame: number) => {
+        let f = frames[frame % frames.length]
+        if (f.replace) {
+            document.title = f.s
+        } else {
+            document.title += f.s
+        }
+        setTimeout(() => changeTitle(frame + 1), f.delay ? f.delay : 500)
+    }
 
     useEffect(() => {
+        if(wasCalled.current) return;
+        wasCalled.current = true;
+        console.log("\n\n%c %c Coded at 5am with ♡ by appxpy", "background: #fff; padding: 23.5px; color: black; text-align: center; font-size: 20px; font-weight: 200; font-family: 'ABC Diatype', serif", "background: #000; padding: 20px; color: #fff; font-size: 20px; font-weight: 200; font-family: 'ABC Diatype Plus Variable', serif")
+        changeTitle(0)
         setDay(new Date().toLocaleString('en-US', {
             weekday: 'long'
         }));
@@ -74,7 +141,6 @@ const Page: FunctionComponent = (props) => {
           >
               <Scene dimensions={dimensions} />
           </Canvas>
-
       <main id="main" className={'absolute inset-0 font-inter font-normal opacity-80 p-6 pointer-events-none'}>
           <div className="relative h-full w-full box-border flex flex-col justify-between">
               <div className="h-20 hidden absolute my-3 mx-6 top-0 right-0 sm:flex flex-col items-end justify-center">
