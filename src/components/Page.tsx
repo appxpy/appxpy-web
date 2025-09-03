@@ -144,7 +144,7 @@ const Page: FunctionComponent = (props) => {
       <main id="main" className={'absolute inset-0 font-inter font-normal opacity-80 p-6 pointer-events-none'}>
           <div className="relative h-full w-full box-border flex flex-col justify-between">
               <div className="h-20 hidden absolute my-3 mx-6 top-0 right-0 sm:flex flex-col items-end justify-center">
-                  <span className="uppercase font-normal text-lg text-end pointer-events-auto">→2024</span>
+                  <span className="uppercase font-normal text-lg text-end pointer-events-auto">→2025</span>
                   <span className="uppercase font-normal text-lg text-end pointer-events-auto">appxpy.com</span>
               </div>
               <div className="h-20 hidden absolute my-3 mx-6 bottom-0 right-0 sm:flex flex-col items-end justify-start">
@@ -177,7 +177,7 @@ const Page: FunctionComponent = (props) => {
               <div className="h-10 w-full flex flex-row items-center justify-center">
             <span
                 className="relative uppercase font-normal text-sm opacity-70 md:text-lg text-start pointer-events-auto">
-              © Pankevich George, 2024
+              © Pankevich George, 2025
             </span>
               </div>
           </div>
