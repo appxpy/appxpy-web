@@ -1,10 +1,9 @@
-import {Dimensions} from "../main";
-import {MeshTransmissionMaterial, Text3D} from "@react-three/drei";
-import React, {useEffect, useRef, useState} from "react";
-import {useFrame} from "@react-three/fiber";
-import {Group, Object3D, Object3DEventMap} from "three";
+import { Dimensions } from "../main";
+import { MeshTransmissionMaterial, Text3D } from "@react-three/drei";
+import React, { useState, useRef } from "react";
+import { useFrame } from "@react-three/fiber";
+import { Group, Object3D } from "three";
 import { easing } from 'maath'
-import {s} from "vite/dist/node/types.d-aGj9QkWt";
 
 export function TextGroup(props: { dimensions: Dimensions }) {
     const scale = Math.min(props.dimensions.width / 14000, props.dimensions.height / 14000)
@@ -23,15 +22,23 @@ export function TextGroup(props: { dimensions: Dimensions }) {
 
     return <group ref={mesh} scale={1.2} position={[scale, 0, 0]}>
         <Text3D scale={scale} position={[-props.dimensions.width / 2400, scale * 2, 0]} rotation={[0, .1, 0]}
-                font={"/ABC Diatype ExtBd_Bold.json"} bevelSegments={12} bevelSize={.03} lineHeight={.7}>
+            font={"/ABC Diatype ExtBd_Bold.json"} bevelSegments={12} bevelSize={.03} lineHeight={.7}>
             PANKEVICH{"\n"}GEORGE ↗
-            <meshLambertMaterial opacity={1} color={0xFFFFFF}/>
+            <meshLambertMaterial opacity={1} color={0xFFFFFF} />
         </Text3D>
-        <Text3D receiveShadow scale={scale} position={[-props.dimensions.width / 2400, -scale * 0.7, 0]} rotation={[0, .1, 0]}
-                font={"/ABC Diatype Med_Italic.json"} bevelSegments={12} bevelSize={.03} lineHeight={.7}>
+        <Text3D scale={scale} position={[-props.dimensions.width / 2400, -scale * 0.7, 0]} rotation={[0, .1, 0]}
+            font={"/ABC Diatype Med_Italic.json"} bevelSegments={24} bevelSize={.03} lineHeight={.7}>
             SOFTWARE{"\n"}ENGINEER
-            <MeshTransmissionMaterial transmission={1} chromaticAberration={.1}
-                                      roughness={.07} thickness={.7}
+            <MeshTransmissionMaterial
+                transmission={1}
+                chromaticAberration={0.25}
+                roughness={0.02}
+                thickness={0.9}
+                ior={1.45}
+                clearcoat={1}
+                clearcoatRoughness={0.03}
+                envMapIntensity={1.2}
+                color={"#f0f8ff"}
             />
         </Text3D>
     </group>;
