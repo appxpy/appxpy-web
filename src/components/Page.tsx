@@ -82,6 +82,8 @@ const Page: FunctionComponent = () => {
     );
     const [copied, setCopied] = useState(false);
     const [infoOpen, setInfoOpen] = useState(false);
+    const [introDone, setIntroDone] = useState(false);
+    const [hintVisible, setHintVisible] = useState(false);
 
     const mousePosRef = useRef<[number, number]>([0.5, 0.5]);
     const wasCalled = useRef(false);
@@ -214,6 +216,18 @@ const Page: FunctionComponent = () => {
         return () => window.removeEventListener('keydown', onKey);
     }, []);
 
+    // Intro fade-in then show keyboard hint briefly
+    useEffect(() => {
+        const t1 = window.setTimeout(() => setIntroDone(true), 400);
+        const t2 = window.setTimeout(() => setHintVisible(true), 1100);
+        const t3 = window.setTimeout(() => setHintVisible(false), 6500);
+        return () => {
+            window.clearTimeout(t1);
+            window.clearTimeout(t2);
+            window.clearTimeout(t3);
+        };
+    }, []);
+
     const year = useMemo(() => new Date().getFullYear(), []);
 
     return (
@@ -257,7 +271,9 @@ const Page: FunctionComponent = () => {
                 id="main"
                 role="main"
                 aria-label="Pankevich George — personal business card"
-                className={'absolute inset-0 font-inter font-normal opacity-80 p-6 pointer-events-none'}
+                className={`absolute inset-0 font-inter font-normal p-6 pointer-events-none transition-opacity duration-700 ease-out ${
+                    introDone ? 'opacity-80' : 'opacity-0'
+                }`}
             >
                 <div className="relative h-full w-full box-border flex flex-col justify-between">
                     <div className="h-20 hidden absolute my-3 mx-6 top-0 right-0 sm:flex flex-col items-end justify-center">
@@ -347,6 +363,18 @@ const Page: FunctionComponent = () => {
                     </footer>
                 </div>
             </main>
+
+            {/* Floating keyboard-shortcut hint */}
+            <div
+                aria-hidden="true"
+                className={`fixed left-1/2 -translate-x-1/2 bottom-14 z-30 pointer-events-none transition-all duration-500 ${
+                    hintVisible && !infoOpen ? 'opacity-70 translate-y-0' : 'opacity-0 translate-y-2'
+                }`}
+            >
+                <div className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm text-[10px] sm:text-xs uppercase tracking-[0.2em] text-white/80 whitespace-nowrap">
+                    <kbd className="font-mono">I</kbd> about&nbsp;·&nbsp;<kbd className="font-mono">Space</kbd> ripple&nbsp;·&nbsp;<kbd className="font-mono">Click</kbd> anywhere
+                </div>
+            </div>
 
             <InfoOverlay open={infoOpen} onClose={closeInfo} />
         </div>
