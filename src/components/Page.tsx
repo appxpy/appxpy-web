@@ -16,7 +16,7 @@ const LINKS = {
 
 // Shared "animated underline" link style used by the footer nav
 const navLinkClass =
-    "relative uppercase font-normal text-[0.95rem] mm:text-lg text-start hover:cursor-pointer " +
+    "relative uppercase font-normal text-[0.9rem] sm:text-lg text-start hover:cursor-pointer " +
     "after:duration-300 after:bg-white after:w-0 after:h-[1.5px] " +
     "after:absolute after:bottom-[5.5px] after:left-0 hover:after:w-full " +
     "pointer-events-auto focus-visible:outline-none focus-visible:after:w-full";
@@ -97,7 +97,6 @@ const Page: FunctionComponent = () => {
     const [copied, setCopied] = useState(false);
     const [infoOpen, setInfoOpen] = useState(false);
     const [introDone, setIntroDone] = useState(false);
-    const [hintVisible, setHintVisible] = useState(false);
     const [webglSupported, setWebglSupported] = useState<boolean>(true);
     const [documentVisible, setDocumentVisible] = useState<boolean>(() =>
         typeof document === 'undefined' ? true : !document.hidden
@@ -271,24 +270,10 @@ const Page: FunctionComponent = () => {
         return () => window.removeEventListener('keydown', onKey);
     }, []);
 
-    // Intro fade-in then show keyboard hint briefly; hint hides on first
-    // meaningful interaction
+    // Intro fade-in
     useEffect(() => {
-        const t1 = window.setTimeout(() => setIntroDone(true), 400);
-        const t2 = window.setTimeout(() => setHintVisible(true), 1100);
-        const t3 = window.setTimeout(() => setHintVisible(false), 6500);
-
-        const hideHint = () => setHintVisible(false);
-        window.addEventListener('click', hideHint, { once: true });
-        window.addEventListener('keydown', hideHint, { once: true });
-
-        return () => {
-            window.clearTimeout(t1);
-            window.clearTimeout(t2);
-            window.clearTimeout(t3);
-            window.removeEventListener('click', hideHint);
-            window.removeEventListener('keydown', hideHint);
-        };
+        const t = window.setTimeout(() => setIntroDone(true), 400);
+        return () => window.clearTimeout(t);
     }, []);
 
     // Detect WebGL availability so we can degrade gracefully
@@ -313,7 +298,7 @@ const Page: FunctionComponent = () => {
 
     return (
         <div
-            className="inset-0 fixed overflow-hidden cursor-crosshair"
+            className="inset-0 fixed overflow-hidden"
             onClick={handleClick}
             onPointerMove={handlePointerMove}
         >
@@ -375,12 +360,19 @@ const Page: FunctionComponent = () => {
                 id="main"
                 role="main"
                 aria-label="Pankevich George — personal business card"
-                className={`absolute inset-0 font-inter font-normal p-6 pointer-events-none transition-opacity duration-700 ease-out ${
-                    introDone ? 'opacity-80' : 'opacity-0'
+                className={`absolute inset-0 font-inter font-normal pointer-events-none transition-opacity duration-700 ease-out ${
+                    introDone ? 'opacity-85' : 'opacity-0'
                 }`}
+                style={{
+                    paddingTop: 'max(1rem, env(safe-area-inset-top))',
+                    paddingRight: 'max(1rem, env(safe-area-inset-right))',
+                    paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
+                    paddingLeft: 'max(1rem, env(safe-area-inset-left))',
+                }}
             >
-                <div className="relative h-full w-full box-border flex flex-col justify-between" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-                    <div className="h-20 hidden absolute my-3 mx-6 top-0 right-0 sm:flex flex-col items-end justify-center">
+                <div className="relative h-full w-full flex flex-col gap-3 sm:gap-0 sm:p-2">
+                    {/* Desktop-only top-right corner */}
+                    <div className="hidden sm:flex flex-col items-end absolute right-0 top-0 pointer-events-none">
                         <span className="uppercase font-normal text-lg text-end pointer-events-auto">→{year}</span>
                         <a
                             href="/"
@@ -390,7 +382,9 @@ const Page: FunctionComponent = () => {
                             appxpy.com
                         </a>
                     </div>
-                    <div className="h-20 hidden absolute my-3 mx-6 bottom-0 right-0 sm:flex flex-col items-end justify-start">
+
+                    {/* Desktop-only bottom-right corner */}
+                    <div className="hidden sm:flex flex-col items-end absolute right-0 bottom-0 pointer-events-none">
                         <button
                             type="button"
                             onClick={openInfo}
@@ -401,8 +395,9 @@ const Page: FunctionComponent = () => {
                         </button>
                         <span className="uppercase font-normal text-xs opacity-50 text-end pointer-events-auto select-none">Press I</span>
                     </div>
-                    {/* Mobile-only top bar: wordmark on the left, About on the right */}
-                    <div className="absolute top-0 left-0 right-0 flex items-center justify-between sm:hidden pointer-events-none">
+
+                    {/* Mobile-only top bar: wordmark left, About right */}
+                    <div className="flex items-center justify-between sm:hidden shrink-0">
                         <a
                             href="/"
                             aria-label="appxpy.com home"
@@ -420,10 +415,42 @@ const Page: FunctionComponent = () => {
                         </button>
                     </div>
 
+                    {/* Header — Day / Logo / CV */}
+                    <header className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-10 md:gap-16 select-none shrink-0 mt-2 sm:mt-0">
+                        <div className="flex items-center justify-center gap-3 pointer-events-auto sm:w-min">
+                            <span className="uppercase font-normal text-base sm:text-lg text-center tabular-nums" aria-label={`Day: ${day}`}>{day}</span>
+                            <span
+                                className="uppercase w-20 font-normal text-lg text-center hidden sm:block tabular-nums"
+                                aria-live="off"
+                                aria-label={`Local time: ${time}`}
+                            >
+                                {time}
+                            </span>
+                        </div>
+                        <Logo size={40} />
+                        <a
+                            className="relative uppercase font-normal text-base sm:text-lg text-center w-40 pointer-events-auto hover:cursor-pointer after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[5.5px] after:left-1/2 after:-translate-x-1/2 hover:after:w-[9.5rem] focus-visible:outline-none focus-visible:after:w-[9.5rem]"
+                            href={LINKS.cv}
+                            target="_blank"
+                            rel="noopener"
+                            download="pankevich-george-cv.pdf"
+                            aria-label="Download CV as PDF"
+                            onMouseEnter={prefetchCv}
+                            onFocus={prefetchCv}
+                            onTouchStart={prefetchCv}
+                        >
+                            DOWNLOAD CV ↗
+                        </a>
+                    </header>
+
+                    {/* Flexible spacer: fills the middle so nav/footer hug the bottom */}
+                    <div className="flex-1 min-h-[2rem]" />
+
+                    {/* Contact nav */}
                     <nav
                         id="contact"
                         aria-label="Contact links"
-                        className="absolute my-6 sm:my-3 sm:mx-6 bottom-10 sm:bottom-0 left-0 flex flex-col items-start justify-start z-20 max-w-[80vw]"
+                        className="flex flex-col items-start shrink-0 max-w-[85vw]"
                     >
                         <a
                             href={`mailto:${LINKS.email}`}
@@ -459,57 +486,17 @@ const Page: FunctionComponent = () => {
                         </a>
                     </nav>
 
-                    <header
-                        className={'flex flex-col mm:flex-row justify-center items-center pt-10 mm:pt-0 h-auto mm:h-10 gap-4 mm:gap-4 sm:gap-10 md:gap-16 select-none'}
-                    >
-                        <div className="flex items-center justify-center mm:justify-between gap-2 mm:gap-3 pointer-events-auto mm:w-min">
-                            <span className="uppercase font-normal text-base mm:text-lg text-center tabular-nums" aria-label={`Day: ${day}`}>{day}</span>
-                            <span
-                                className="uppercase w-20 font-normal text-lg text-center hidden sm:block tabular-nums"
-                                aria-live="off"
-                                aria-label={`Local time: ${time}`}
-                            >
-                                {time}
-                            </span>
-                        </div>
-                        <Logo size={40} />
-                        <a
-                            className="relative uppercase font-normal text-base mm:text-lg text-center w-40 pointer-events-auto hover:cursor-pointer after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[5.5px] after:left-1/2 after:-translate-x-1/2 hover:after:w-[9.5rem] focus-visible:outline-none focus-visible:after:w-[9.5rem]"
-                            href={LINKS.cv}
-                            target="_blank"
-                            rel="noopener"
-                            download="pankevich-george-cv.pdf"
-                            aria-label="Download CV as PDF"
-                            onMouseEnter={prefetchCv}
-                            onFocus={prefetchCv}
-                            onTouchStart={prefetchCv}
-                        >
-                            DOWNLOAD CV ↗
-                        </a>
-                    </header>
-
-                    <footer className="h-10 w-full flex flex-col items-center justify-center gap-1">
-                        <span className="relative uppercase font-normal text-sm opacity-70 md:text-lg text-start pointer-events-auto">
+                    {/* Footer */}
+                    <footer className="w-full flex flex-col items-center justify-center gap-1 shrink-0 mt-3 sm:mt-4">
+                        <span className="uppercase font-normal text-xs sm:text-sm md:text-base opacity-70 text-center pointer-events-auto">
                             © Pankevich George, {year}
                         </span>
-                        <span className="relative uppercase font-normal text-[10px] sm:text-xs opacity-50 text-center pointer-events-auto select-none">
+                        <span className="uppercase font-normal text-[10px] sm:text-xs opacity-50 text-center pointer-events-auto select-none">
                             Currently · Go Engineer at VK · Moscow
                         </span>
                     </footer>
                 </div>
             </main>
-
-            {/* Floating keyboard-shortcut hint */}
-            <div
-                aria-hidden="true"
-                className={`fixed left-1/2 -translate-x-1/2 bottom-14 z-30 pointer-events-none transition-all duration-500 ${
-                    hintVisible && !infoOpen ? 'opacity-70 translate-y-0' : 'opacity-0 translate-y-2'
-                }`}
-            >
-                <div className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm text-[10px] sm:text-xs uppercase tracking-[0.2em] text-white/80 whitespace-nowrap">
-                    <kbd className="font-mono">I</kbd> about&nbsp;·&nbsp;<kbd className="font-mono">Space</kbd> ripple&nbsp;·&nbsp;<kbd className="font-mono">Click</kbd> anywhere
-                </div>
-            </div>
 
             <InfoOverlay open={infoOpen} onClose={closeInfo} />
         </div>
