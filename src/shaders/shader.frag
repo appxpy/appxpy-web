@@ -90,11 +90,22 @@ void main() {
         totalGlow += trail * fade * 0.012;
     }
 
-    // --- Core fluid field (kept from original, with small touches) ---
-    for (float i = 1.0; i < 6.0; i++) {
-        uv.x += 1.2 / i * cos(i * 0.5 * uv.y + slowedTime);
-        uv.y += 0.6 / i * cos(i * 1.4 * uv.x + slowedTime);
-    }
+    // --- Core fluid field (unrolled for compile-time loop cost) ---
+    // i = 1
+    uv.x += 1.2 * cos(0.5 * uv.y + slowedTime);
+    uv.y += 0.6 * cos(1.4 * uv.x + slowedTime);
+    // i = 2
+    uv.x += 0.6 * cos(1.0 * uv.y + slowedTime);
+    uv.y += 0.3 * cos(2.8 * uv.x + slowedTime);
+    // i = 3
+    uv.x += 0.4 * cos(1.5 * uv.y + slowedTime);
+    uv.y += 0.2 * cos(4.2 * uv.x + slowedTime);
+    // i = 4
+    uv.x += 0.3 * cos(2.0 * uv.y + slowedTime);
+    uv.y += 0.15 * cos(5.6 * uv.x + slowedTime);
+    // i = 5
+    uv.x += 0.24 * cos(2.5 * uv.y + slowedTime);
+    uv.y += 0.12 * cos(7.0 * uv.x + slowedTime);
 
     // Subtle film grain (very low amplitude so it doesn't overwhelm the field)
     float grain = vnoise(gl_FragCoord.xy * 0.9 + uTime * 12.0) * 0.025;
