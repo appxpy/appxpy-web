@@ -1,18 +1,19 @@
 // -----------------------------------------------------------------------------
-// Minimalist interactive dot-grid background.
+// Flowing contour lines — minimalist, abstract, interactive.
 //
-// Pure monochrome: a regular grid of tiny white dots on black.
-// The cursor pushes nearby dots outward (magnetic repulsion), and clicks
-// emit an expanding ring that sweeps dots outward radially.
-// Everything is computed in CSS-pixel space via vUv + iResolution, so it
-// is DPR-independent and consistent across mouse / click / fragment.
+// A slowly-drifting FBM scalar field is sliced into equally-spaced isolines
+// (like a topographic map). The cursor pulls the field upward to create a
+// local "hill" (contours bend around it). Clicks emit a radial ripple wave
+// that temporarily bumps the field outward from the click point.
+//
+// Everything is computed in CSS pixel space via vUv + iResolution so it is
+// DPR-independent and consistent between fragment, mouse, and click.
 // -----------------------------------------------------------------------------
 varying vec2 vUv;
 uniform float uTime;
 uniform vec2 iResolution;
 uniform float uDpr;
 
-// Ripples
 const int MAX_RIPPLES = 8;
 uniform vec2 uClicks[8];
 uniform float uClickTimes[8];
@@ -20,121 +21,130 @@ uniform int uRippleCount;
 uniform vec2 uMouse;
 uniform float uReducedMotion; // 0.0 or 1.0
 
-// Hash for subtle per-cell variation
+// -----------------------------------------------------------------------------
+// Hash / noise helpers
+// -----------------------------------------------------------------------------
 float hash12(vec2 p) {
     p = fract(p * vec2(123.34, 456.21));
     p += dot(p, p + 45.32);
     return fract(p.x * p.y);
 }
 
-// -----------------------------------------------------------------------------
-// Displacement field evaluated at a point in CSS pixel space.
-// Combines:
-//   - cursor repulsion: dots within CURSOR_RADIUS are pushed radially outward
-//   - click ripples:    expanding ring pushes dots at the ring's radius
-//   - idle drift:       slow sinusoidal breathing so the grid feels alive
-// -----------------------------------------------------------------------------
-vec2 displacementAt(vec2 pos, vec2 mousePx, vec2 cellIdx) {
-    vec2 disp = vec2(0.0);
+float vnoise(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    float a = hash12(i);
+    float b = hash12(i + vec2(1.0, 0.0));
+    float c = hash12(i + vec2(0.0, 1.0));
+    float d = hash12(i + vec2(1.0, 1.0));
+    vec2 u = f * f * (3.0 - 2.0 * f);
+    return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+}
 
-    // --- Cursor repulsion ---
-    vec2 toFromMouse = pos - mousePx;
-    float mouseDist = length(toFromMouse);
-    const float CURSOR_RADIUS = 150.0;           // CSS px
-    const float CURSOR_STRENGTH = 22.0;          // max push distance
-    if (mouseDist > 0.001 && mouseDist < CURSOR_RADIUS) {
-        float n = mouseDist / CURSOR_RADIUS;
-        float strength = pow(1.0 - n, 2.0);
-        disp += (toFromMouse / mouseDist) * strength * CURSOR_STRENGTH;
+// 4-octave FBM with per-octave rotation
+float fbm(vec2 p) {
+    float v = 0.0;
+    float a = 0.55;
+    mat2 rot = mat2(0.80, 0.60, -0.60, 0.80);
+    for (int i = 0; i < 4; i++) {
+        v += a * vnoise(p);
+        p = rot * p * 2.03 + vec2(3.7, 1.3);
+        a *= 0.5;
     }
+    return v;
+}
 
-    // --- Click ripples ---
-    for (int i = 0; i < MAX_RIPPLES; i++) {
-        if (i >= uRippleCount) break;
-        float elapsed = uTime - uClickTimes[i];
-        if (elapsed < 0.0 || elapsed > 2.8) continue;
-
-        float t = clamp(elapsed / 2.8, 0.0, 1.0);
-        float eased = 1.0 - pow(1.0 - t, 3.0);
-        float radius = eased * 620.0;            // CSS px
-        float fade = pow(1.0 - t, 1.7);
-
-        vec2 clickPx = uClicks[i] * iResolution.xy;
-        vec2 fromClick = pos - clickPx;
-        float distFromClick = length(fromClick);
-        if (distFromClick < 0.001) continue;
-
-        // Dots in a soft band at the current ring radius get pushed outward.
-        float ringBand = smoothstep(90.0, 0.0, abs(distFromClick - radius));
-        disp += (fromClick / distFromClick) * ringBand * fade * 36.0;
-    }
-
-    // --- Idle drift: tiny sinusoidal wave per cell so it never feels static ---
-    float driftScale = mix(1.0, 0.0, uReducedMotion);
-    float driftT = uTime * 0.55;
-    vec2 drift = vec2(
-        sin(cellIdx.x * 0.35 + cellIdx.y * 0.22 + driftT),
-        cos(cellIdx.y * 0.28 + cellIdx.x * 0.18 + driftT * 0.9)
-    ) * 1.4 * driftScale;
-    disp += drift;
-
-    return disp;
+// Aspect-corrected UV centered at origin (shortest side ≈ 1)
+vec2 toUV(vec2 uv01) {
+    return (uv01 - 0.5) * iResolution.xy / min(iResolution.x, iResolution.y);
 }
 
 // -----------------------------------------------------------------------------
 // Main
 // -----------------------------------------------------------------------------
 void main() {
-    // CSS pixel coordinates derived from vUv + iResolution (DPR-independent).
-    vec2 px = vUv * iResolution.xy;
-    vec2 mousePx = uMouse * iResolution.xy;
+    float motionScale = mix(1.0, 0.15, uReducedMotion);
+    float T = uTime * 0.06 * motionScale;
 
-    // Grid cell size adapts to the shortest edge so mobile still reads
-    // at ~11 columns; desktop gets a denser-but-still-minimal grid.
-    float shortEdge = min(iResolution.x, iResolution.y);
-    float cellSize = clamp(shortEdge / 22.0, 30.0, 46.0);
+    vec2 p = toUV(vUv) * 1.35;
+    vec2 mouseP = toUV(uMouse);
 
-    vec2 cellIdx0 = floor(px / cellSize);
+    // --- Domain warp for swirl ---
+    vec2 warp = vec2(
+        fbm(p * 0.9 + vec2(T * 1.0,  T * 0.3)),
+        fbm(p * 0.9 + vec2(T * 0.4, -T * 0.8) + 5.2)
+    );
+    vec2 q = p + (warp - 0.5) * 0.55;
 
-    // For each fragment we check a 3×3 neighbourhood of cells and take
-    // the closest displaced dot. This handles dots pushed across cell
-    // boundaries by cursor/ripple displacement.
-    float minD = 1e9;
-    float nearestFade = 1.0;
+    // --- Scalar field value ---
+    float f  = fbm(q * 1.25 + vec2( T * 0.7, -T * 0.4));
+    f       += fbm(q * 2.80 + vec2(-T * 0.3,  T * 0.5)) * 0.35;
 
-    for (int dy = -1; dy <= 1; dy++) {
-        for (int dx = -1; dx <= 1; dx++) {
-            vec2 cIdx    = cellIdx0 + vec2(float(dx), float(dy));
-            vec2 cCenter = (cIdx + 0.5) * cellSize;
-            vec2 disp    = displacementAt(cCenter, mousePx, cIdx);
-            vec2 dotPos  = cCenter + disp;
+    // --- Cursor pulls the field up (local Gaussian bump) ---
+    vec2 toMouse = p - mouseP;
+    float mouseDist2 = dot(toMouse, toMouse);
+    float mouseBlob = exp(-mouseDist2 * 4.2) * 0.85;
+    f += mouseBlob;
 
-            float d = distance(px, dotPos);
-            if (d < minD) {
-                minD = d;
-                // Soft per-dot brightness variation so it's not completely uniform
-                float h = hash12(cIdx);
-                nearestFade = 0.70 + 0.30 * h;
-            }
-        }
+    // --- Click ripples: radial travelling waves ---
+    for (int i = 0; i < MAX_RIPPLES; i++) {
+        if (i >= uRippleCount) break;
+        float elapsed = uTime - uClickTimes[i];
+        if (elapsed < 0.0 || elapsed > 3.5) continue;
+
+        float tt = clamp(elapsed / 3.5, 0.0, 1.0);
+        float fade = pow(1.0 - tt, 2.0) * smoothstep(0.0, 0.08, elapsed);
+
+        vec2 clickP = toUV(uClicks[i]);
+        float r = distance(p, clickP);
+
+        // Radial sine wave that travels outward
+        float wave = sin(r * 16.0 - elapsed * 9.0) * exp(-r * 1.6);
+        f += wave * fade * 0.32;
+
+        // Small Gaussian bump at the click origin so the first frame pops
+        float bump = exp(-r * r * 10.0) * (1.0 - tt) * 0.4;
+        f += bump;
     }
 
-    // Dot radius in CSS pixels — very small, very clean.
-    float dotRadius = 1.35;
-    float dotEdge   = 0.85;
-    float dotMask   = smoothstep(dotRadius + dotEdge, dotRadius, minD);
+    // -------------------------------------------------------------------------
+    // Contour lines — anti-aliased via fwidth
+    // -------------------------------------------------------------------------
+    const float LEVELS_A = 7.0;
+    const float LEVELS_B = 14.0;
 
-    // Base colour: pure white dots, black background
-    vec3 col = vec3(dotMask * nearestFade * 0.62);
+    // Primary contours (thicker)
+    float la = f * LEVELS_A;
+    float da = min(fract(la), 1.0 - fract(la));
+    float fwa = max(fwidth(la), 0.0001);
+    float lineA = 1.0 - smoothstep(0.0, fwa * 1.4, da);
 
-    // Soft vignette — a touch deeper in the corners
+    // Secondary finer contours — subtle
+    float lb = f * LEVELS_B;
+    float db = min(fract(lb), 1.0 - fract(lb));
+    float fwb = max(fwidth(lb), 0.0001);
+    float lineB = (1.0 - smoothstep(0.0, fwb * 0.9, db)) * 0.22;
+
+    float lines = max(lineA, lineB);
+
+    // Soft vignette so corners are deeper than the centre
     vec2 ndc = vUv * 2.0 - 1.0;
     float vignette = 1.0 - dot(ndc, ndc) * 0.28;
-    col *= vignette;
+
+    // Ambient gradient wash so the page isn't pure black — gives the glass
+    // refractions something to work with and prevents 8-bit banding.
+    float wash = 0.02 + 0.035 * smoothstep(-0.2, 1.2, f);
+
+    float brightness = (lines * 0.78 + wash) * vignette;
+
+    vec3 col = vec3(brightness);
+
+    // Tiny warm bias in brighter regions (matches the page's near-monochrome aesthetic)
+    col.r += brightness * 0.015;
+    col.g += brightness * 0.005;
 
     // 8-bit anti-banding dither
-    float dither = (hash12(px + mod(uTime, 1.0)) - 0.5) * (1.0 / 255.0);
-    col += dither;
+    col += (hash12(vUv * iResolution.xy + mod(uTime, 1.0)) - 0.5) / 255.0;
 
     gl_FragColor = vec4(col, 1.0);
 }
