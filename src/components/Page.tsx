@@ -167,16 +167,27 @@ const Page: FunctionComponent = (props) => {
                         <span className="uppercase font-normal text-lg text-end pointer-events-auto">Business Card</span>
                     </div>
                     <div
-                        className="h-20 absolute my-6 sm:my-3 sm:mx-6 bottom-0 left-0 flex flex-col items-start justify-start z-20">
+                        className="absolute my-6 sm:my-3 sm:mx-6 bottom-0 left-0 flex flex-col items-start justify-start z-20">
                         <a
-                            href="mailto:appxpy@appxpy.com"
-                            className="relative uppercase font-normal text-lg text-start hover:cursor-pointer after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[5.5px] after:left-0 hover:after:w-full pointer-events-auto">↗
-                            mail: appxpy@appxpy.com
+                            href="mailto:me@appxpy.com"
+                            aria-label="Email me at me@appxpy.com"
+                            className="relative uppercase font-normal text-lg text-start hover:cursor-pointer after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[5.5px] after:left-0 hover:after:w-full pointer-events-auto focus-visible:outline-none focus-visible:after:w-full">↗
+                            mail: me@appxpy.com
                         </a>
                         <a
                             href="https://t.me/appxpy"
-                            className="relative uppercase font-normal text-lg text-start hover:cursor-pointer after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[5.5px] after:left-0 hover:after:w-full pointer-events-auto">↗
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Telegram @appxpy"
+                            className="relative uppercase font-normal text-lg text-start hover:cursor-pointer after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[5.5px] after:left-0 hover:after:w-full pointer-events-auto focus-visible:outline-none focus-visible:after:w-full">↗
                             telegram: @appxpy</a>
+                        <a
+                            href="https://github.com/appxpy"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="GitHub @appxpy"
+                            className="relative uppercase font-normal text-lg text-start hover:cursor-pointer after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[5.5px] after:left-0 hover:after:w-full pointer-events-auto focus-visible:outline-none focus-visible:after:w-full">↗
+                            github: @appxpy</a>
                     </div>
                     <header
                         className={'flex flex-col mm:flex-row justify-center items-center h-32 mm:h-10 gap-3 mm:gap-4 sm:gap-10 md:gap-16 select-none'}>
@@ -185,8 +196,11 @@ const Page: FunctionComponent = (props) => {
                             <span className="uppercase w-20 font-normal text-lg text-center hidden sm:block">{time}</span>
                         </div>
                         <Logo size={40} />
-                        <a className="uppercase font-normal text-lg text-center w-40 pointer-events-auto"
-                            href={"/resume.pdf"}>DOWNLOAD CV</a>
+                        <a className="relative uppercase font-normal text-lg text-center w-40 pointer-events-auto hover:cursor-pointer after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[5.5px] after:left-1/2 after:-translate-x-1/2 hover:after:w-[9.5rem] focus-visible:outline-none focus-visible:after:w-[9.5rem]"
+                            href={"/resume.pdf"}
+                            target="_blank"
+                            rel="noopener"
+                            aria-label="Download CV as PDF">DOWNLOAD CV ↗</a>
                     </header>
 
                     <div className="h-10 w-full flex flex-row items-center justify-center">
