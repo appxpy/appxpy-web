@@ -158,6 +158,7 @@
 html {
   overscroll-behavior: none;
   overflow: hidden;
+  scroll-behavior: smooth;
 }
 
 body {
