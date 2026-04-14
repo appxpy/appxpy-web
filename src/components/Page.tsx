@@ -7,6 +7,13 @@ import { Canvas } from "@react-three/fiber";
 import { ClickData } from "./Plane";
 import InfoOverlay from "./InfoOverlay";
 
+const LINKS = {
+    email: 'me@appxpy.com',
+    telegram: 'https://t.me/appxpy',
+    github: 'https://github.com/appxpy',
+    cv: '/resume.pdf',
+} as const;
+
 const TITLE_FRAMES: { s: string, delay?: number, replace?: boolean }[] = [
     { s: "Pankevich\u205fGeorge", replace: true },
     { s: "Pankevich#George", replace: true, delay: 50 },
@@ -110,7 +117,7 @@ const Page: FunctionComponent = () => {
         // Best-effort copy to clipboard alongside the default mailto:
         try {
             if (navigator.clipboard?.writeText) {
-                await navigator.clipboard.writeText('me@appxpy.com');
+                await navigator.clipboard.writeText(LINKS.email);
                 setCopied(true);
                 window.setTimeout(() => setCopied(false), 1600);
             }
@@ -344,12 +351,12 @@ const Page: FunctionComponent = () => {
                         className="absolute my-6 sm:my-3 sm:mx-6 bottom-10 sm:bottom-0 left-0 flex flex-col items-start justify-start z-20 max-w-[80vw]"
                     >
                         <a
-                            href="mailto:me@appxpy.com"
+                            href={`mailto:${LINKS.email}`}
                             onClick={handleEmailClick}
-                            aria-label="Email me at me@appxpy.com (click to also copy)"
+                            aria-label={`Email me at ${LINKS.email} (click to also copy)`}
                             className="relative uppercase font-normal text-lg text-start hover:cursor-pointer after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[5.5px] after:left-0 hover:after:w-full pointer-events-auto focus-visible:outline-none focus-visible:after:w-full"
                         >
-                            ↗ mail: me@appxpy.com
+                            ↗ mail: {LINKS.email}
                             <span
                                 aria-hidden="true"
                                 className={`ml-2 text-xs normal-case opacity-0 transition-opacity duration-300 ${copied ? 'opacity-80' : ''}`}
@@ -358,7 +365,7 @@ const Page: FunctionComponent = () => {
                             </span>
                         </a>
                         <a
-                            href="https://t.me/appxpy"
+                            href={LINKS.telegram}
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="Telegram @appxpy"
@@ -367,7 +374,7 @@ const Page: FunctionComponent = () => {
                             ↗ telegram: @appxpy
                         </a>
                         <a
-                            href="https://github.com/appxpy"
+                            href={LINKS.github}
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="GitHub @appxpy"
@@ -393,18 +400,22 @@ const Page: FunctionComponent = () => {
                         <Logo size={40} />
                         <a
                             className="relative uppercase font-normal text-lg text-center w-40 pointer-events-auto hover:cursor-pointer after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[5.5px] after:left-1/2 after:-translate-x-1/2 hover:after:w-[9.5rem] focus-visible:outline-none focus-visible:after:w-[9.5rem]"
-                            href={"/resume.pdf"}
+                            href={LINKS.cv}
                             target="_blank"
                             rel="noopener"
+                            download="pankevich-george-cv.pdf"
                             aria-label="Download CV as PDF"
                         >
                             DOWNLOAD CV ↗
                         </a>
                     </header>
 
-                    <footer className="h-10 w-full flex flex-row items-center justify-center">
+                    <footer className="h-10 w-full flex flex-col items-center justify-center gap-1">
                         <span className="relative uppercase font-normal text-sm opacity-70 md:text-lg text-start pointer-events-auto">
                             © Pankevich George, {year}
+                        </span>
+                        <span className="relative uppercase font-normal text-[10px] sm:text-xs opacity-50 text-center pointer-events-auto select-none">
+                            Currently · Go Engineer at VK · Moscow
                         </span>
                     </footer>
                 </div>
