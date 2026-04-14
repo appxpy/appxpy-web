@@ -167,7 +167,7 @@ export const InfoOverlay: FunctionComponent<InfoOverlayProps> = ({ open, onClose
                     monolith-to-microservices migration, observability, and internal libraries.
                 </p>
 
-                <section className="mt-10">
+                <section className="mt-12 pt-8 border-t border-white/10">
                     <h3 className="uppercase text-xs tracking-[0.2em] opacity-60 mb-4">Experience</h3>
                     <ul className="space-y-7">
                         {ROLES.map((role) => (
@@ -189,7 +189,7 @@ export const InfoOverlay: FunctionComponent<InfoOverlayProps> = ({ open, onClose
                     </ul>
                 </section>
 
-                <section className="mt-10">
+                <section className="mt-12 pt-8 border-t border-white/10">
                     <h3 className="uppercase text-xs tracking-[0.2em] opacity-60 mb-4">Selected Projects</h3>
                     <ul className="space-y-5">
                         {PROJECTS.map((p) => (
@@ -202,7 +202,7 @@ export const InfoOverlay: FunctionComponent<InfoOverlayProps> = ({ open, onClose
                     </ul>
                 </section>
 
-                <section className="mt-10">
+                <section className="mt-12 pt-8 border-t border-white/10">
                     <h3 className="uppercase text-xs tracking-[0.2em] opacity-60 mb-4">Skills</h3>
                     <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
                         {SKILLS.map((s) => (
@@ -214,13 +214,13 @@ export const InfoOverlay: FunctionComponent<InfoOverlayProps> = ({ open, onClose
                     </dl>
                 </section>
 
-                <section className="mt-10">
+                <section className="mt-12 pt-8 border-t border-white/10">
                     <h3 className="uppercase text-xs tracking-[0.2em] opacity-60 mb-4">Education</h3>
                     <p className="text-base">HSE University</p>
                     <p className="text-sm opacity-70">BSc, Information Security · 2022 — 2026</p>
                 </section>
 
-                <section className="mt-10 pb-6">
+                <section className="mt-12 pt-8 border-t border-white/10 pb-16">
                     <h3 className="uppercase text-xs tracking-[0.2em] opacity-60 mb-4">Elsewhere</h3>
                     <ul className="space-y-1.5 text-sm">
                         <li><a className="underline decoration-white/30 underline-offset-4 hover:decoration-white" href="mailto:me@appxpy.com">me@appxpy.com</a></li>

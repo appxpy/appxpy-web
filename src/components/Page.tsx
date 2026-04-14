@@ -92,6 +92,9 @@ const Page: FunctionComponent = () => {
     const [introDone, setIntroDone] = useState(false);
     const [hintVisible, setHintVisible] = useState(false);
     const [webglSupported, setWebglSupported] = useState<boolean>(true);
+    const [documentVisible, setDocumentVisible] = useState<boolean>(() =>
+        typeof document === 'undefined' ? true : !document.hidden
+    );
 
     const mousePosRef = useRef<[number, number]>([0.5, 0.5]);
     const wasCalled = useRef(false);
@@ -247,6 +250,13 @@ const Page: FunctionComponent = () => {
         }
     }, []);
 
+    // Pause canvas frame loop when tab is hidden to save battery
+    useEffect(() => {
+        const onVis = () => setDocumentVisible(!document.hidden);
+        document.addEventListener('visibilitychange', onVis);
+        return () => document.removeEventListener('visibilitychange', onVis);
+    }, []);
+
     const year = useMemo(() => new Date().getFullYear(), []);
 
     return (
@@ -260,7 +270,7 @@ const Page: FunctionComponent = () => {
                     className={"fixed inset-0 w-full h-full overflow-hidden touch-auto"}
                     aria-hidden="true"
                     dpr={[1, reducedMotion ? 1.25 : 2]}
-                    frameloop={reducedMotion ? 'demand' : 'always'}
+                    frameloop={reducedMotion || !documentVisible ? 'demand' : 'always'}
                     gl={{
                         antialias: true,
                         toneMapping: ACESFilmicToneMapping,
