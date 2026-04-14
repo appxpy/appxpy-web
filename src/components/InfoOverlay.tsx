@@ -50,7 +50,6 @@ interface Project {
     name: string;
     stack: string;
     blurb: string;
-    href?: string;
 }
 
 const PROJECTS: Project[] = [
@@ -58,19 +57,16 @@ const PROJECTS: Project[] = [
         name: 'Sphere',
         stack: 'TypeScript · GLSL · OpenGL · Go · WebSockets',
         blurb: 'Procedurally generated sphere — 100k particles driven by a 7-shader pipeline, real-time in the browser. Go backend syncs geolocations across clients.',
-        href: 'https://github.com/appxpy',
     },
     {
         name: 'NFFS — Neural Network From Scratch',
         stack: 'C++ · CMake · Qt · GoogleTest · Doxygen',
         blurb: 'Perceptron-architecture neural network framework. Designed the architecture, wrote unit tests and docs.',
-        href: 'https://github.com/appxpy',
     },
     {
         name: 'Speech2Text Telegram Bot',
         stack: 'Python · Aiogram · PostgreSQL · Docker · Yandex SpeechKit',
         blurb: 'Transcribes voice and video messages. End-to-end pipelines for build and deploy.',
-        href: 'https://github.com/appxpy',
     },
 ];
 
@@ -208,29 +204,15 @@ export const InfoOverlay: FunctionComponent<InfoOverlayProps> = ({ open, onClose
                     <ul className="space-y-5">
                         {PROJECTS.map((p) => (
                             <li key={p.name}>
-                                {p.href ? (
-                                    <a
-                                        href={p.href}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="group block -mx-2 px-2 py-1 rounded hover:bg-white/[0.03] focus-visible:bg-white/[0.05] focus-visible:outline-none transition-colors"
-                                    >
-                                        <p className="text-base group-hover:underline underline-offset-4 decoration-white/40">
-                                            {p.name} <span className="opacity-40 text-sm">↗</span>
-                                        </p>
-                                        <p className="text-xs uppercase opacity-50 tracking-wider mt-0.5">{p.stack}</p>
-                                        <p className="text-sm opacity-80 mt-1 leading-relaxed">{p.blurb}</p>
-                                    </a>
-                                ) : (
-                                    <div>
-                                        <p className="text-base">{p.name}</p>
-                                        <p className="text-xs uppercase opacity-50 tracking-wider mt-0.5">{p.stack}</p>
-                                        <p className="text-sm opacity-80 mt-1 leading-relaxed">{p.blurb}</p>
-                                    </div>
-                                )}
+                                <p className="text-base">{p.name}</p>
+                                <p className="text-xs uppercase opacity-50 tracking-wider mt-0.5">{p.stack}</p>
+                                <p className="text-sm opacity-80 mt-1 leading-relaxed">{p.blurb}</p>
                             </li>
                         ))}
                     </ul>
+                    <p className="text-xs uppercase opacity-50 tracking-wider mt-5">
+                        More on <a href="https://github.com/appxpy" target="_blank" rel="noopener noreferrer" className="underline decoration-white/30 underline-offset-4 hover:decoration-white">github.com/appxpy</a>
+                    </p>
                 </section>
 
                 <section className="mt-12 pt-8 border-t border-white/10">
