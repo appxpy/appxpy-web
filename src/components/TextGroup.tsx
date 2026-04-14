@@ -53,15 +53,20 @@ export function TextGroup(props: { dimensions: Dimensions }) {
             >
                 SOFTWARE{"\n"}ENGINEER
                 <MeshTransmissionMaterial
-                    transmission={1}
-                    chromaticAberration={0.25}
-                    roughness={0.02}
-                    thickness={0.9}
+                    transmission={0.85}
+                    chromaticAberration={0.35}
+                    roughness={0.08}
+                    thickness={1.8}
                     ior={1.45}
                     clearcoat={1}
-                    clearcoatRoughness={0.03}
-                    envMapIntensity={1.2}
-                    color={"#f0f8ff"}
+                    clearcoatRoughness={0.05}
+                    envMapIntensity={1.4}
+                    attenuationColor={"#dfe8f5"}
+                    attenuationDistance={2.2}
+                    color={"#ffffff"}
+                    backside={true}
+                    samples={6}
+                    resolution={512}
                 />
             </Text3D>
         </group>
