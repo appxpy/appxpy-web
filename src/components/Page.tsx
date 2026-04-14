@@ -14,6 +14,13 @@ const LINKS = {
     cv: '/resume.pdf',
 } as const;
 
+// Shared "animated underline" link style used by the footer nav
+const navLinkClass =
+    "relative uppercase font-normal text-lg text-start hover:cursor-pointer " +
+    "after:duration-300 after:bg-white after:w-0 after:h-[1.5px] " +
+    "after:absolute after:bottom-[5.5px] after:left-0 hover:after:w-full " +
+    "pointer-events-auto focus-visible:outline-none focus-visible:after:w-full";
+
 const TITLE_FRAMES: { s: string, delay?: number, replace?: boolean }[] = [
     { s: "Pankevich\u205fGeorge", replace: true },
     { s: "Pankevich#George", replace: true, delay: 50 },
@@ -381,7 +388,7 @@ const Page: FunctionComponent = () => {
                             href={`mailto:${LINKS.email}`}
                             onClick={handleEmailClick}
                             aria-label={`Email me at ${LINKS.email} (click to also copy)`}
-                            className="relative uppercase font-normal text-lg text-start hover:cursor-pointer after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[5.5px] after:left-0 hover:after:w-full pointer-events-auto focus-visible:outline-none focus-visible:after:w-full"
+                            className={navLinkClass}
                         >
                             ↗ mail: {LINKS.email}
                             <span
@@ -396,7 +403,7 @@ const Page: FunctionComponent = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="Telegram @appxpy"
-                            className="relative uppercase font-normal text-lg text-start hover:cursor-pointer after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[5.5px] after:left-0 hover:after:w-full pointer-events-auto focus-visible:outline-none focus-visible:after:w-full"
+                            className={navLinkClass}
                         >
                             ↗ telegram: @appxpy
                         </a>
@@ -405,7 +412,7 @@ const Page: FunctionComponent = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="GitHub @appxpy"
-                            className="relative uppercase font-normal text-lg text-start hover:cursor-pointer after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[5.5px] after:left-0 hover:after:w-full pointer-events-auto focus-visible:outline-none focus-visible:after:w-full"
+                            className={navLinkClass}
                         >
                             ↗ github: @appxpy
                         </a>
