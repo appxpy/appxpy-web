@@ -16,7 +16,7 @@ const LINKS = {
 
 // Shared "animated underline" link style used by the footer nav
 const navLinkClass =
-    "relative uppercase font-normal text-lg text-start hover:cursor-pointer " +
+    "relative uppercase font-normal text-[0.95rem] mm:text-lg text-start hover:cursor-pointer " +
     "after:duration-300 after:bg-white after:w-0 after:h-[1.5px] " +
     "after:absolute after:bottom-[5.5px] after:left-0 hover:after:w-full " +
     "pointer-events-auto focus-visible:outline-none focus-visible:after:w-full";
