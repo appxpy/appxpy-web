@@ -33,9 +33,11 @@ const Plane: FunctionComponent<Props> = (props) => {
   const lastClickRef = useRef<ClickData | null>(null);
   const ripplesRef = useRef<Ripple[]>([]);
 
-  useFrame(() => {
-    const mat = ref.current!.material;
-    const now = (new Date().getTime() / 1000) % 86400;
+  useFrame((state) => {
+    const mat = ref.current?.material;
+    if (!mat) return;
+    // Monotonic elapsed time from R3F's clock — stable across tab suspend/resume.
+    const now = state.clock.elapsedTime;
     mat.uniforms.uTime.value = now;
     mat.uniforms.uMouse.value = props.mousePosRef.current;
 
@@ -44,26 +46,27 @@ const Plane: FunctionComponent<Props> = (props) => {
       lastClickRef.current = props.clickData;
       const ripples = ripplesRef.current;
       ripples.push({ x: props.clickData.x, y: props.clickData.y, startTime: now });
-      // Cap at MAX_RIPPLES — drop oldest
       if (ripples.length > MAX_RIPPLES) {
         ripples.shift();
       }
     }
 
-    // Prune expired ripples (>2.5s)
-    ripplesRef.current = ripplesRef.current.filter(r => (now - r.startTime) <= 2.5);
-
-    const ripples = ripplesRef.current;
-    const count = ripples.length;
-
-    // Upload arrays to shader
-    for (let i = 0; i < MAX_RIPPLES; i++) {
-      if (i < count) {
-        mat.uniforms.uClicks.value[i].set(ripples[i].x, ripples[i].y);
-        mat.uniforms.uClickTimes.value[i] = ripples[i].startTime;
+    // Prune expired ripples in place
+    const all = ripplesRef.current;
+    let write = 0;
+    for (let i = 0; i < all.length; i++) {
+      if (now - all[i].startTime <= 2.8) {
+        all[write++] = all[i];
       }
     }
-    mat.uniforms.uRippleCount.value = count;
+    all.length = write;
+
+    // Upload arrays to shader
+    for (let i = 0; i < all.length; i++) {
+      mat.uniforms.uClicks.value[i].set(all[i].x, all[i].y);
+      mat.uniforms.uClickTimes.value[i] = all[i].startTime;
+    }
+    mat.uniforms.uRippleCount.value = all.length;
   })
 
   const uniforms = useMemo(() => {
@@ -78,7 +81,7 @@ const Plane: FunctionComponent<Props> = (props) => {
 
     return {
       uTime: {
-        value: (new Date().getTime() / 1000) % 86400
+        value: 0
       },
       iResolution: {
         value: [window.innerWidth, window.innerHeight]
