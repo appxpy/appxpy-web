@@ -5,6 +5,7 @@ import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
 import Scene from "../Scene";
 import { Canvas } from "@react-three/fiber";
 import { ClickData } from "./Plane";
+import InfoOverlay from "./InfoOverlay";
 
 const TITLE_FRAMES: { s: string, delay?: number, replace?: boolean }[] = [
     { s: "Pankevich\u205fGeorge", replace: true },
@@ -80,15 +81,20 @@ const Page: FunctionComponent = () => {
         typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false
     );
     const [copied, setCopied] = useState(false);
+    const [infoOpen, setInfoOpen] = useState(false);
 
     const mousePosRef = useRef<[number, number]>([0.5, 0.5]);
     const wasCalled = useRef(false);
 
     const handleClick = useCallback((e: React.MouseEvent) => {
+        if (infoOpen) return;
         const nx = e.clientX / window.innerWidth;
         const ny = 1.0 - (e.clientY / window.innerHeight);
         setClickData({ x: nx, y: ny, time: Date.now() });
-    }, []);
+    }, [infoOpen]);
+
+    const openInfo = useCallback(() => setInfoOpen(true), []);
+    const closeInfo = useCallback(() => setInfoOpen(false), []);
 
     const handlePointerMove = useCallback((e: React.PointerEvent) => {
         mousePosRef.current = [
@@ -199,6 +205,9 @@ const Page: FunctionComponent = () => {
                     y: 0.15 + Math.random() * 0.7,
                     time: Date.now(),
                 });
+            } else if (e.key === 'i' || e.key === 'I') {
+                e.preventDefault();
+                setInfoOpen((v) => !v);
             }
         };
         window.addEventListener('keydown', onKey);
@@ -256,8 +265,15 @@ const Page: FunctionComponent = () => {
                         <span className="uppercase font-normal text-lg text-end pointer-events-auto">appxpy.com</span>
                     </div>
                     <div className="h-20 hidden absolute my-3 mx-6 bottom-0 right-0 sm:flex flex-col items-end justify-start">
-                        <span className="uppercase font-normal text-lg text-end pointer-events-auto">Personal</span>
-                        <span className="uppercase font-normal text-lg text-end pointer-events-auto">Business Card</span>
+                        <button
+                            type="button"
+                            onClick={openInfo}
+                            aria-label="Open about panel (press I)"
+                            className="relative uppercase font-normal text-lg text-end hover:cursor-pointer after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[5.5px] after:right-0 hover:after:w-full pointer-events-auto focus-visible:outline-none focus-visible:after:w-full"
+                        >
+                            About ↗
+                        </button>
+                        <span className="uppercase font-normal text-xs opacity-50 text-end pointer-events-auto select-none">Press I</span>
                     </div>
 
                     <nav
@@ -331,6 +347,8 @@ const Page: FunctionComponent = () => {
                     </footer>
                 </div>
             </main>
+
+            <InfoOverlay open={infoOpen} onClose={closeInfo} />
         </div>
     );
 };
