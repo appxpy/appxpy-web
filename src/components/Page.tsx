@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react';
+import React, { FunctionComponent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Logo } from "./Logo";
 import { Dimensions } from "../main";
 import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
@@ -6,209 +6,308 @@ import Scene from "../Scene";
 import { Canvas } from "@react-three/fiber";
 import { ClickData } from "./Plane";
 
-const Page: FunctionComponent = (props) => {
-    const [time, setTime] = useState("");
-    const [day, setDay] = useState("");
+const TITLE_FRAMES: { s: string, delay?: number, replace?: boolean }[] = [
+    { s: "Pankevich\u205fGeorge", replace: true },
+    { s: "Pankevich#George", replace: true, delay: 50 },
+    { s: "Pank#vich*George", replace: true, delay: 50 },
+    { s: "Pank*vich*Geor#e", replace: true, delay: 50 },
+    { s: "#ank*vich*Geor*e", replace: true, delay: 50 },
+    { s: "*#nk*vich*Geor*e", replace: true, delay: 50 },
+    { s: "**#k*vich*Geor*e", replace: true, delay: 50 },
+    { s: "***k*vich*Ge#r*e", replace: true, delay: 50 },
+    { s: "***k*v#ch*Ge*r*e", replace: true, delay: 50 },
+    { s: "***#*v*ch*Ge*r*e", replace: true, delay: 50 },
+    { s: "*****v*c#*Ge*r*e", replace: true, delay: 50 },
+    { s: "*****v*c**#e*r*e", replace: true, delay: 50 },
+    { s: "*****v*#***e*r*e", replace: true, delay: 50 },
+    { s: "*****#*****e*r*e", replace: true, delay: 50 },
+    { s: "***********#*r*e", replace: true, delay: 50 },
+    { s: "*************r*#", replace: true, delay: 50 },
+    { s: "*************#**", replace: true, delay: 50 },
+    { s: "****************", replace: true, delay: 1000 },
+    { s: "*******x*******", replace: true, delay: 100 },
+    { s: "* ****pxp**** *", replace: true, delay: 100 },
+    { s: "*  **ppxpy**  *", replace: true, delay: 100 },
+    { s: "*   appxpy    *", replace: true, delay: 100 },
+    { s: "appxpy", replace: true, delay: 1000 },
+    { s: "\u205f", replace: true, delay: 100 },
+    { s: "appxpy", replace: true, delay: 70 },
+    { s: "\u205f", replace: true, delay: 70 },
+    { s: "appxpy", replace: true, delay: 50 },
+    { s: "\u205f", replace: true, delay: 50 },
+    { s: "appxpy", replace: true, delay: 30 },
+    { s: "\u205f", replace: true, delay: 30 },
+    { s: "appxpy", replace: true, delay: 10 },
+    { s: "\u205f", replace: true, delay: 1000 },
+    { s: "P", delay: 100 },
+    { s: "a", delay: 100 },
+    { s: "n", delay: 100 },
+    { s: "k", delay: 100 },
+    { s: "e", delay: 100 },
+    { s: "v", delay: 100 },
+    { s: "i", delay: 100 },
+    { s: "c", delay: 100 },
+    { s: "h", delay: 100 },
+    { s: "\u205f", delay: 100 },
+    { s: "G", delay: 100 },
+    { s: "e", delay: 100 },
+    { s: "o", delay: 100 },
+    { s: "r", delay: 100 },
+    { s: "g", delay: 100 },
+    { s: "e", delay: 2000 },
+];
+
+const computeDimensions = (): Dimensions => ({
+    width: window.innerWidth,
+    height: window.innerHeight,
+    aspectWH: window.innerWidth / window.innerHeight,
+    aspectHW: window.innerHeight / window.innerWidth,
+    aspect: Math.max(window.innerWidth / window.innerHeight, window.innerHeight / window.innerWidth),
+});
+
+const formatTime = (d: Date) =>
+    d.toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+
+const formatDay = (d: Date) =>
+    d.toLocaleString('en-US', { weekday: 'long' });
+
+const Page: FunctionComponent = () => {
+    const [time, setTime] = useState(() => formatTime(new Date()));
+    const [day, setDay] = useState(() => formatDay(new Date()));
     const [clickData, setClickData] = useState<ClickData | null>(null);
+    const [dimensions, setDimensions] = useState<Dimensions>(computeDimensions);
+    const [reducedMotion, setReducedMotion] = useState<boolean>(() =>
+        typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false
+    );
+    const [copied, setCopied] = useState(false);
+
     const mousePosRef = useRef<[number, number]>([0.5, 0.5]);
+    const wasCalled = useRef(false);
 
     const handleClick = useCallback((e: React.MouseEvent) => {
         const nx = e.clientX / window.innerWidth;
         const ny = 1.0 - (e.clientY / window.innerHeight);
         setClickData({ x: nx, y: ny, time: Date.now() });
     }, []);
-    const handleMouseMove = useCallback((e: React.MouseEvent) => {
+
+    const handlePointerMove = useCallback((e: React.PointerEvent) => {
         mousePosRef.current = [
             e.clientX / window.innerWidth,
-            1.0 - (e.clientY / window.innerHeight)
+            1.0 - (e.clientY / window.innerHeight),
         ];
     }, []);
-    const [dimensions, setDimensions] = useState<Dimensions>({
-        width: window.innerWidth,
-        height: window.innerHeight,
-        aspectWH: window.innerWidth / window.innerHeight,
-        aspectHW: window.innerHeight / window.innerWidth,
-        aspect: Math.max(window.innerWidth / window.innerHeight, window.innerHeight / window.innerWidth)
-    });
-    const wasCalled = useRef(false);
 
-    const frames: { s: string, delay?: number, replace?: boolean }[] = [
-        { s: "Pankevich\u205fGeorge", replace: true },
-        { s: "Pankevich#George", replace: true, delay: 50 },
-        { s: "Pank#vich*George", replace: true, delay: 50 },
-        { s: "Pank*vich*Geor#e", replace: true, delay: 50 },
-        { s: "#ank*vich*Geor*e", replace: true, delay: 50 },
-        { s: "*#nk*vich*Geor*e", replace: true, delay: 50 },
-        { s: "**#k*vich*Geor*e", replace: true, delay: 50 },
-        { s: "***k*vich*Ge#r*e", replace: true, delay: 50 },
-        { s: "***k*v#ch*Ge*r*e", replace: true, delay: 50 },
-        { s: "***#*v*ch*Ge*r*e", replace: true, delay: 50 },
-        { s: "*****v*c#*Ge*r*e", replace: true, delay: 50 },
-        { s: "*****v*c**#e*r*e", replace: true, delay: 50 },
-        { s: "*****v*#***e*r*e", replace: true, delay: 50 },
-        { s: "*****#*****e*r*e", replace: true, delay: 50 },
-        { s: "***********#*r*e", replace: true, delay: 50 },
-        { s: "*************r*#", replace: true, delay: 50 },
-        { s: "*************#**", replace: true, delay: 50 },
-        { s: "****************", replace: true, delay: 1000 },
-        { s: "*******x*******", replace: true, delay: 100 },
-        { s: "* ****pxp**** *", replace: true, delay: 100 },
-        { s: "*  **ppxpy**  *", replace: true, delay: 100 },
-        { s: "*   appxpy    *", replace: true, delay: 100 },
-        { s: "appxpy", replace: true, delay: 1000 },
-        { s: "\u205f", replace: true, delay: 100 },
-        { s: "appxpy", replace: true, delay: 70 },
-        { s: "\u205f", replace: true, delay: 70 },
-        { s: "appxpy", replace: true, delay: 50 },
-        { s: "\u205f", replace: true, delay: 50 },
-        { s: "appxpy", replace: true, delay: 30 },
-        { s: "\u205f", replace: true, delay: 30 },
-        { s: "appxpy", replace: true, delay: 10 },
-        { s: "\u205f", replace: true, delay: 1000 },
-        { s: "P", delay: 100 },
-        { s: "a", delay: 100 },
-        { s: "n", delay: 100 },
-        { s: "k", delay: 100 },
-        { s: "e", delay: 100 },
-        { s: "v", delay: 100 },
-        { s: "i", delay: 100 },
-        { s: "c", delay: 100 },
-        { s: "h", delay: 100 },
-        { s: "\u205f", delay: 100 },
-        { s: "G", delay: 100 },
-        { s: "e", delay: 100 },
-        { s: "o", delay: 100 },
-        { s: "r", delay: 100 },
-        { s: "g", delay: 100 },
-        { s: "e", delay: 2000 },
-    ]
-
-
-    const changeTitle = (frame: number) => {
-        let f = frames[frame % frames.length]
-        if (f.replace) {
-            document.title = f.s
-        } else {
-            document.title += f.s
+    const handleEmailClick = useCallback(async (e: React.MouseEvent<HTMLAnchorElement>) => {
+        // Best-effort copy to clipboard alongside the default mailto:
+        try {
+            if (navigator.clipboard?.writeText) {
+                await navigator.clipboard.writeText('me@appxpy.com');
+                setCopied(true);
+                window.setTimeout(() => setCopied(false), 1600);
+            }
+        } catch {
+            /* noop — mailto: still fires */
         }
-        setTimeout(() => changeTitle(frame + 1), f.delay ? f.delay : 500)
-    }
+        // Do NOT preventDefault: let the mailto: happen too.
+        void e;
+    }, []);
 
+    // Title animation — properly cancellable
     useEffect(() => {
         if (wasCalled.current) return;
         wasCalled.current = true;
-        console.log("\n\n%c %c Coded at 5am with ♡ by appxpy", "background: #fff; padding: 23.5px; color: black; text-align: center; font-size: 20px; font-weight: 200; font-family: 'ABC Diatype', serif", "background: #000; padding: 20px; color: #fff; font-size: 20px; font-weight: 200; font-family: 'ABC Diatype Plus Variable', serif")
-        changeTitle(0)
-        setDay(new Date().toLocaleString('en-US', {
-            weekday: 'long'
-        }));
-        setTime(new Date().toLocaleString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false
-        }));
-        const timer = setInterval(() => {
-            setDay(new Date().toLocaleString('en-US', {
-                weekday: 'long'
-            }));
-            setTime(new Date().toLocaleString('en-US', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
-            }));
-        }, 500);
-        setDimensions({
-            width: window.innerWidth,
-            height: window.innerHeight,
-            aspectWH: window.innerWidth / window.innerHeight,
-            aspectHW: window.innerHeight / window.innerWidth,
-            aspect: Math.max(window.innerWidth / window.innerHeight, window.innerHeight / window.innerWidth)
-        });
+        // eslint-disable-next-line no-console
+        console.log(
+            "\n\n%c %c Coded with \u2661 by appxpy ",
+            "background:#fff;padding:23.5px;color:#000;font-size:20px;font-weight:200;font-family:'ABC Diatype',serif",
+            "background:#000;padding:20px;color:#fff;font-size:20px;font-weight:200;font-family:'ABC Diatype Plus Variable',serif"
+        );
 
-        const listener = () => {
-            setDimensions({
-                width: window.innerWidth,
-                height: window.innerHeight,
-                aspectWH: window.innerWidth / window.innerHeight,
-                aspectHW: window.innerHeight / window.innerWidth,
-                aspect: Math.max(window.innerWidth / window.innerHeight, window.innerHeight / window.innerWidth)
-            });
-        }
+        let timeout: number | undefined;
+        let cancelled = false;
+        const tick = (frame: number) => {
+            if (cancelled) return;
+            const f = TITLE_FRAMES[frame % TITLE_FRAMES.length];
+            if (f.replace) {
+                document.title = f.s;
+            } else {
+                document.title += f.s;
+            }
+            timeout = window.setTimeout(() => tick(frame + 1), f.delay ?? 500);
+        };
+        tick(0);
+        return () => {
+            cancelled = true;
+            if (timeout) window.clearTimeout(timeout);
+        };
+    }, []);
 
-        addEventListener("resize", listener)
-        return () => { removeEventListener("resize", listener); clearInterval(timer) }
-    }, [])
+    // Clock — pauses while tab is hidden to save battery
+    useEffect(() => {
+        let interval: number | undefined;
+        const start = () => {
+            if (interval) return;
+            interval = window.setInterval(() => {
+                const now = new Date();
+                setDay(formatDay(now));
+                setTime(formatTime(now));
+            }, 500);
+        };
+        const stop = () => {
+            if (interval) {
+                window.clearInterval(interval);
+                interval = undefined;
+            }
+        };
+        const onVisibility = () => (document.hidden ? stop() : start());
+        start();
+        document.addEventListener('visibilitychange', onVisibility);
+        return () => {
+            document.removeEventListener('visibilitychange', onVisibility);
+            stop();
+        };
+    }, []);
+
+    // Resize listener
+    useEffect(() => {
+        const onResize = () => setDimensions(computeDimensions());
+        window.addEventListener('resize', onResize);
+        return () => window.removeEventListener('resize', onResize);
+    }, []);
+
+    // Track prefers-reduced-motion dynamically
+    useEffect(() => {
+        if (!window.matchMedia) return;
+        const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+        const onChange = () => setReducedMotion(mq.matches);
+        mq.addEventListener?.('change', onChange);
+        return () => mq.removeEventListener?.('change', onChange);
+    }, []);
+
+    const year = useMemo(() => new Date().getFullYear(), []);
 
     return (
-        <div className="inset-0 fixed overflow-hidden" onClick={handleClick} onMouseMove={handleMouseMove}>
+        <div
+            className="inset-0 fixed overflow-hidden"
+            onClick={handleClick}
+            onPointerMove={handlePointerMove}
+        >
             <Canvas
                 className={"fixed inset-0 w-full h-full overflow-hidden touch-auto"}
-                dpr={[1, 2]}
+                aria-hidden="true"
+                dpr={[1, reducedMotion ? 1.25 : 2]}
+                frameloop={reducedMotion ? 'demand' : 'always'}
                 gl={{
                     antialias: true,
                     toneMapping: ACESFilmicToneMapping,
                     outputColorSpace: SRGBColorSpace,
+                    powerPreference: 'high-performance',
                 }}
                 orthographic
-                camera={{ zoom: 1000, position: [0, 0, 5], top: dimensions.height / 2, bottom: dimensions.height / -2, left: dimensions.width / -2, right: dimensions.width / 2 }}
+                camera={{
+                    zoom: 1000,
+                    position: [0, 0, 5],
+                    top: dimensions.height / 2,
+                    bottom: dimensions.height / -2,
+                    left: dimensions.width / -2,
+                    right: dimensions.width / 2,
+                }}
             >
                 <Scene dimensions={dimensions} clickData={clickData} mousePosRef={mousePosRef} />
             </Canvas>
-            <main id="main" className={'absolute inset-0 font-inter font-normal opacity-80 p-6 pointer-events-none'}>
+
+            <a
+                href="#contact"
+                className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-white focus:text-black focus:px-3 focus:py-2 focus:uppercase focus:text-sm"
+            >
+                Skip to contact
+            </a>
+
+            <main
+                id="main"
+                role="main"
+                aria-label="Pankevich George — personal business card"
+                className={'absolute inset-0 font-inter font-normal opacity-80 p-6 pointer-events-none'}
+            >
                 <div className="relative h-full w-full box-border flex flex-col justify-between">
                     <div className="h-20 hidden absolute my-3 mx-6 top-0 right-0 sm:flex flex-col items-end justify-center">
-                        <span className="uppercase font-normal text-lg text-end pointer-events-auto">→2026</span>
+                        <span className="uppercase font-normal text-lg text-end pointer-events-auto">→{year}</span>
                         <span className="uppercase font-normal text-lg text-end pointer-events-auto">appxpy.com</span>
                     </div>
                     <div className="h-20 hidden absolute my-3 mx-6 bottom-0 right-0 sm:flex flex-col items-end justify-start">
                         <span className="uppercase font-normal text-lg text-end pointer-events-auto">Personal</span>
                         <span className="uppercase font-normal text-lg text-end pointer-events-auto">Business Card</span>
                     </div>
-                    <div
-                        className="absolute my-6 sm:my-3 sm:mx-6 bottom-0 left-0 flex flex-col items-start justify-start z-20">
+
+                    <nav
+                        id="contact"
+                        aria-label="Contact links"
+                        className="absolute my-6 sm:my-3 sm:mx-6 bottom-0 left-0 flex flex-col items-start justify-start z-20"
+                    >
                         <a
                             href="mailto:me@appxpy.com"
-                            aria-label="Email me at me@appxpy.com"
-                            className="relative uppercase font-normal text-lg text-start hover:cursor-pointer after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[5.5px] after:left-0 hover:after:w-full pointer-events-auto focus-visible:outline-none focus-visible:after:w-full">↗
-                            mail: me@appxpy.com
+                            onClick={handleEmailClick}
+                            aria-label="Email me at me@appxpy.com (click to also copy)"
+                            className="relative uppercase font-normal text-lg text-start hover:cursor-pointer after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[5.5px] after:left-0 hover:after:w-full pointer-events-auto focus-visible:outline-none focus-visible:after:w-full"
+                        >
+                            ↗ mail: me@appxpy.com
+                            <span
+                                aria-hidden="true"
+                                className={`ml-2 text-xs normal-case opacity-0 transition-opacity duration-300 ${copied ? 'opacity-80' : ''}`}
+                            >
+                                (copied)
+                            </span>
                         </a>
                         <a
                             href="https://t.me/appxpy"
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="Telegram @appxpy"
-                            className="relative uppercase font-normal text-lg text-start hover:cursor-pointer after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[5.5px] after:left-0 hover:after:w-full pointer-events-auto focus-visible:outline-none focus-visible:after:w-full">↗
-                            telegram: @appxpy</a>
+                            className="relative uppercase font-normal text-lg text-start hover:cursor-pointer after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[5.5px] after:left-0 hover:after:w-full pointer-events-auto focus-visible:outline-none focus-visible:after:w-full"
+                        >
+                            ↗ telegram: @appxpy
+                        </a>
                         <a
                             href="https://github.com/appxpy"
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="GitHub @appxpy"
-                            className="relative uppercase font-normal text-lg text-start hover:cursor-pointer after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[5.5px] after:left-0 hover:after:w-full pointer-events-auto focus-visible:outline-none focus-visible:after:w-full">↗
-                            github: @appxpy</a>
-                    </div>
+                            className="relative uppercase font-normal text-lg text-start hover:cursor-pointer after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[5.5px] after:left-0 hover:after:w-full pointer-events-auto focus-visible:outline-none focus-visible:after:w-full"
+                        >
+                            ↗ github: @appxpy
+                        </a>
+                    </nav>
+
                     <header
-                        className={'flex flex-col mm:flex-row justify-center items-center h-32 mm:h-10 gap-3 mm:gap-4 sm:gap-10 md:gap-16 select-none'}>
+                        className={'flex flex-col mm:flex-row justify-center items-center h-32 mm:h-10 gap-3 mm:gap-4 sm:gap-10 md:gap-16 select-none'}
+                    >
                         <div className="flex justify-center mm:justify-between w-min order-2 mm:order-[0] pointer-events-auto">
-                            <span className="uppercase font-normal text-lg text-center">{day}</span>
-                            <span className="uppercase w-20 font-normal text-lg text-center hidden sm:block">{time}</span>
+                            <span className="uppercase font-normal text-lg text-center" aria-label={`Day: ${day}`}>{day}</span>
+                            <span
+                                className="uppercase w-20 font-normal text-lg text-center hidden sm:block"
+                                aria-live="off"
+                                aria-label={`Local time: ${time}`}
+                            >
+                                {time}
+                            </span>
                         </div>
                         <Logo size={40} />
-                        <a className="relative uppercase font-normal text-lg text-center w-40 pointer-events-auto hover:cursor-pointer after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[5.5px] after:left-1/2 after:-translate-x-1/2 hover:after:w-[9.5rem] focus-visible:outline-none focus-visible:after:w-[9.5rem]"
+                        <a
+                            className="relative uppercase font-normal text-lg text-center w-40 pointer-events-auto hover:cursor-pointer after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[5.5px] after:left-1/2 after:-translate-x-1/2 hover:after:w-[9.5rem] focus-visible:outline-none focus-visible:after:w-[9.5rem]"
                             href={"/resume.pdf"}
                             target="_blank"
                             rel="noopener"
-                            aria-label="Download CV as PDF">DOWNLOAD CV ↗</a>
+                            aria-label="Download CV as PDF"
+                        >
+                            DOWNLOAD CV ↗
+                        </a>
                     </header>
 
-                    <div className="h-10 w-full flex flex-row items-center justify-center">
-                        <span
-                            className="relative uppercase font-normal text-sm opacity-70 md:text-lg text-start pointer-events-auto">
-                            © Pankevich George, 2026
+                    <footer className="h-10 w-full flex flex-row items-center justify-center">
+                        <span className="relative uppercase font-normal text-sm opacity-70 md:text-lg text-start pointer-events-auto">
+                            © Pankevich George, {year}
                         </span>
-                    </div>
+                    </footer>
                 </div>
             </main>
         </div>
