@@ -113,21 +113,6 @@ const Page: FunctionComponent = () => {
         setClickData({ x: nx, y: ny, time: Date.now() });
     }, [infoOpen]);
 
-    // Long-press anywhere (mobile) opens the About overlay
-    const longPressTimer = useRef<number | undefined>(undefined);
-    const handlePointerDown = useCallback((e: React.PointerEvent) => {
-        if (e.pointerType !== 'touch' || infoOpen) return;
-        longPressTimer.current = window.setTimeout(() => {
-            setInfoOpen(true);
-        }, 650);
-    }, [infoOpen]);
-    const cancelLongPress = useCallback(() => {
-        if (longPressTimer.current) {
-            window.clearTimeout(longPressTimer.current);
-            longPressTimer.current = undefined;
-        }
-    }, []);
-
     const openInfo = useCallback(() => setInfoOpen(true), []);
     const closeInfo = useCallback(() => setInfoOpen(false), []);
 
@@ -331,10 +316,6 @@ const Page: FunctionComponent = () => {
             className="inset-0 fixed overflow-hidden cursor-crosshair"
             onClick={handleClick}
             onPointerMove={handlePointerMove}
-            onPointerDown={handlePointerDown}
-            onPointerUp={cancelLongPress}
-            onPointerCancel={cancelLongPress}
-            onPointerLeave={cancelLongPress}
         >
             {webglSupported ? (
                 <Canvas
@@ -420,13 +401,20 @@ const Page: FunctionComponent = () => {
                         </button>
                         <span className="uppercase font-normal text-xs opacity-50 text-end pointer-events-auto select-none">Press I</span>
                     </div>
-                    {/* Mobile-only About button so it's reachable without keyboard */}
-                    <div className="absolute top-0 right-0 my-6 mx-6 sm:hidden">
+                    {/* Mobile-only top bar: wordmark on the left, About on the right */}
+                    <div className="absolute top-0 left-0 right-0 flex items-center justify-between sm:hidden pointer-events-none">
+                        <a
+                            href="/"
+                            aria-label="appxpy.com home"
+                            className="uppercase font-normal text-sm pointer-events-auto relative after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[3.5px] after:left-0 hover:after:w-full focus-visible:outline-none focus-visible:after:w-full"
+                        >
+                            appxpy.com
+                        </a>
                         <button
                             type="button"
                             onClick={openInfo}
                             aria-label="Open about panel"
-                            className="relative uppercase font-normal text-sm text-end pointer-events-auto after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[3.5px] after:right-0 hover:after:w-full focus-visible:outline-none focus-visible:after:w-full"
+                            className="relative uppercase font-normal text-sm pointer-events-auto after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[3.5px] after:right-0 hover:after:w-full focus-visible:outline-none focus-visible:after:w-full"
                         >
                             About ↗
                         </button>
@@ -472,12 +460,12 @@ const Page: FunctionComponent = () => {
                     </nav>
 
                     <header
-                        className={'flex flex-col mm:flex-row justify-center items-center h-32 mm:h-10 gap-3 mm:gap-4 sm:gap-10 md:gap-16 select-none'}
+                        className={'flex flex-col mm:flex-row justify-center items-center pt-10 mm:pt-0 h-auto mm:h-10 gap-4 mm:gap-4 sm:gap-10 md:gap-16 select-none'}
                     >
-                        <div className="flex justify-center mm:justify-between w-min order-2 mm:order-[0] pointer-events-auto">
-                            <span className="uppercase font-normal text-lg text-center" aria-label={`Day: ${day}`}>{day}</span>
+                        <div className="flex items-center justify-center mm:justify-between gap-2 mm:gap-3 pointer-events-auto mm:w-min">
+                            <span className="uppercase font-normal text-base mm:text-lg text-center tabular-nums" aria-label={`Day: ${day}`}>{day}</span>
                             <span
-                                className="uppercase w-20 font-normal text-lg text-center hidden sm:block"
+                                className="uppercase w-20 font-normal text-lg text-center hidden sm:block tabular-nums"
                                 aria-live="off"
                                 aria-label={`Local time: ${time}`}
                             >
@@ -486,7 +474,7 @@ const Page: FunctionComponent = () => {
                         </div>
                         <Logo size={40} />
                         <a
-                            className="relative uppercase font-normal text-lg text-center w-40 pointer-events-auto hover:cursor-pointer after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[5.5px] after:left-1/2 after:-translate-x-1/2 hover:after:w-[9.5rem] focus-visible:outline-none focus-visible:after:w-[9.5rem]"
+                            className="relative uppercase font-normal text-base mm:text-lg text-center w-40 pointer-events-auto hover:cursor-pointer after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[5.5px] after:left-1/2 after:-translate-x-1/2 hover:after:w-[9.5rem] focus-visible:outline-none focus-visible:after:w-[9.5rem]"
                             href={LINKS.cv}
                             target="_blank"
                             rel="noopener"
