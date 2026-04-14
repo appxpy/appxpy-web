@@ -184,6 +184,27 @@ const Page: FunctionComponent = () => {
         return () => mq.removeEventListener?.('change', onChange);
     }, []);
 
+    // Keyboard shortcuts: space/R spawn a ripple at a pseudo-random spot
+    useEffect(() => {
+        const onKey = (e: KeyboardEvent) => {
+            // Ignore when typing in an input or with modifiers held
+            const target = e.target as HTMLElement | null;
+            if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
+            if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+            if (e.key === ' ' || e.key === 'r' || e.key === 'R') {
+                e.preventDefault();
+                setClickData({
+                    x: 0.15 + Math.random() * 0.7,
+                    y: 0.15 + Math.random() * 0.7,
+                    time: Date.now(),
+                });
+            }
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, []);
+
     const year = useMemo(() => new Date().getFullYear(), []);
 
     return (

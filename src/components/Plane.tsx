@@ -70,6 +70,11 @@ const Plane: FunctionComponent<Props> = (props) => {
     // Pre-allocate arrays
     const clicks = Array.from({ length: MAX_RIPPLES }, () => new Vector2(0, 0));
     const times = new Float32Array(MAX_RIPPLES);
+    const reducedMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+        ? 1.0
+        : 0.0;
 
     return {
       uTime: {
@@ -92,6 +97,9 @@ const Plane: FunctionComponent<Props> = (props) => {
       },
       uMouse: {
         value: [0.5, 0.5]
+      },
+      uReducedMotion: {
+        value: reducedMotion
       }
     }
   }, []);
@@ -108,6 +116,20 @@ const Plane: FunctionComponent<Props> = (props) => {
     return () => {
       removeEventListener("resize", listener)
     }
+  }, []);
+
+  // Track prefers-reduced-motion live
+  useEffect(() => {
+    if (!window.matchMedia) return;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => {
+      if (ref.current) {
+        ref.current.material.uniforms.uReducedMotion.value = mq.matches ? 1.0 : 0.0;
+      }
+    };
+    update();
+    mq.addEventListener?.('change', update);
+    return () => mq.removeEventListener?.('change', update);
   }, []);
 
   return (
