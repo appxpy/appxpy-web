@@ -14,11 +14,18 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (!id.includes('node_modules')) return
-          if (id.includes('three-stdlib') || id.includes('@react-three/drei')) return 'drei'
-          if (id.includes('three')) return 'three'
-          if (id.includes('@react-three/fiber')) return 'fiber'
-          if (id.includes('react-dom') || id.includes('scheduler')) return 'react-dom'
-          if (id.includes('react')) return 'react'
+          // Three + all R3F/drei/maath/stdlib deps live together to avoid
+          // circular chunk warnings
+          if (
+            id.includes('/three/') ||
+            id.includes('three-stdlib') ||
+            id.includes('@react-three') ||
+            id.includes('/maath/') ||
+            id.includes('troika') ||
+            id.includes('meshline')
+          ) {
+            return 'three'
+          }
           return 'vendor'
         },
       },
