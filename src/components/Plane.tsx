@@ -107,11 +107,12 @@ const Plane: FunctionComponent<Props> = (props) => {
     }
   }, []);
 
-  // Keep iResolution uniform in sync with the current canvas dimensions.
+  // Keep iResolution / DPR uniforms in sync with the current canvas dimensions.
   useEffect(() => {
     const mat = ref.current?.material;
     if (!mat) return;
     mat.uniforms.iResolution.value = [props.dimensions.width, props.dimensions.height];
+    mat.uniforms.uDpr.value = window.devicePixelRatio || 1;
   }, [props.dimensions.width, props.dimensions.height]);
 
   // Track prefers-reduced-motion live
