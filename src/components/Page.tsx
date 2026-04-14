@@ -274,15 +274,23 @@ const Page: FunctionComponent = () => {
         return () => window.removeEventListener('keydown', onKey);
     }, []);
 
-    // Intro fade-in then show keyboard hint briefly
+    // Intro fade-in then show keyboard hint briefly; hint hides on first
+    // meaningful interaction
     useEffect(() => {
         const t1 = window.setTimeout(() => setIntroDone(true), 400);
         const t2 = window.setTimeout(() => setHintVisible(true), 1100);
         const t3 = window.setTimeout(() => setHintVisible(false), 6500);
+
+        const hideHint = () => setHintVisible(false);
+        window.addEventListener('click', hideHint, { once: true });
+        window.addEventListener('keydown', hideHint, { once: true });
+
         return () => {
             window.clearTimeout(t1);
             window.clearTimeout(t2);
             window.clearTimeout(t3);
+            window.removeEventListener('click', hideHint);
+            window.removeEventListener('keydown', hideHint);
         };
     }, []);
 
