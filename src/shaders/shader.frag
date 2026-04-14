@@ -56,8 +56,9 @@ void main() {
         float normDist = mouseDist / lensRadius;
         float warp = lensStrength * pow(1.0 - normDist, 2.0) / (mouseDist + 0.01);
         uv -= toMouse * warp;
-        // subtle halo around cursor
-        totalGlow += pow(1.0 - normDist, 3.0) * 0.015;
+        // subtle pulsing halo around cursor
+        float pulse = 0.85 + 0.15 * sin(uTime * 1.8);
+        totalGlow += pow(1.0 - normDist, 3.0) * 0.02 * pulse;
     }
 
     // --- Shockwave ripples from all active clicks ---

@@ -131,7 +131,7 @@ const Page: FunctionComponent = () => {
         void e;
     }, []);
 
-    // Title animation — properly cancellable
+    // Title animation — properly cancellable; pauses when the tab is hidden
     useEffect(() => {
         if (wasCalled.current) return;
         wasCalled.current = true;
@@ -143,21 +143,38 @@ const Page: FunctionComponent = () => {
         );
 
         let timeout: number | undefined;
+        let frame = 0;
         let cancelled = false;
-        const tick = (frame: number) => {
-            if (cancelled) return;
-            const f = TITLE_FRAMES[frame % TITLE_FRAMES.length];
-            if (f.replace) {
-                document.title = f.s;
-            } else {
-                document.title += f.s;
-            }
-            timeout = window.setTimeout(() => tick(frame + 1), f.delay ?? 500);
+
+        const schedule = (delay: number) => {
+            timeout = window.setTimeout(() => {
+                if (cancelled || document.hidden) return;
+                const f = TITLE_FRAMES[frame % TITLE_FRAMES.length];
+                if (f.replace) {
+                    document.title = f.s;
+                } else {
+                    document.title += f.s;
+                }
+                frame += 1;
+                schedule(f.delay ?? 500);
+            }, delay);
         };
-        tick(0);
+
+        const onVisibility = () => {
+            if (document.hidden) {
+                if (timeout) window.clearTimeout(timeout);
+                timeout = undefined;
+            } else if (!cancelled && timeout === undefined) {
+                schedule(250);
+            }
+        };
+
+        schedule(0);
+        document.addEventListener('visibilitychange', onVisibility);
         return () => {
             cancelled = true;
             if (timeout) window.clearTimeout(timeout);
+            document.removeEventListener('visibilitychange', onVisibility);
         };
     }, []);
 
