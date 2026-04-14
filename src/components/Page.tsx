@@ -131,6 +131,18 @@ const Page: FunctionComponent = () => {
     const openInfo = useCallback(() => setInfoOpen(true), []);
     const closeInfo = useCallback(() => setInfoOpen(false), []);
 
+    // Warm up the CV download on first hover for instant perceived open
+    const cvPrefetched = useRef(false);
+    const prefetchCv = useCallback(() => {
+        if (cvPrefetched.current) return;
+        cvPrefetched.current = true;
+        const link = document.createElement('link');
+        link.rel = 'prefetch';
+        link.href = LINKS.cv;
+        link.as = 'document';
+        document.head.appendChild(link);
+    }, []);
+
     const handlePointerMove = useCallback((e: React.PointerEvent) => {
         mousePosRef.current = [
             e.clientX / window.innerWidth,
@@ -480,6 +492,9 @@ const Page: FunctionComponent = () => {
                             rel="noopener"
                             download="pankevich-george-cv.pdf"
                             aria-label="Download CV as PDF"
+                            onMouseEnter={prefetchCv}
+                            onFocus={prefetchCv}
+                            onTouchStart={prefetchCv}
                         >
                             DOWNLOAD CV ↗
                         </a>
