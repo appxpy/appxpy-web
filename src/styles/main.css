@@ -173,6 +173,14 @@ body {
   touch-action: manipulation;
 }
 
+/* Only show a visible focus ring for keyboard users */
+:focus:not(:focus-visible) { outline: none; }
+:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
 /* Pretty keyboard chips used in the hint bar */
 kbd {
   display: inline-block;
