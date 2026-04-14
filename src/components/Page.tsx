@@ -234,10 +234,10 @@ const Page: FunctionComponent = () => {
         };
     }, []);
 
-    // Resize listener
+    // Resize listener (passive)
     useEffect(() => {
         const onResize = () => setDimensions(computeDimensions());
-        window.addEventListener('resize', onResize);
+        window.addEventListener('resize', onResize, { passive: true });
         return () => window.removeEventListener('resize', onResize);
     }, []);
 
