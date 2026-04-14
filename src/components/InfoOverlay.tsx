@@ -251,6 +251,36 @@ export const InfoOverlay: FunctionComponent<InfoOverlayProps> = ({ open, onClose
                     <p className="text-sm opacity-70">BSc, Information Security · 2022 — 2026</p>
                 </section>
 
+                <section className="mt-12 pt-8 border-t border-white/10">
+                    <h3 className="uppercase text-xs tracking-[0.2em] opacity-60 mb-4">Keyboard</h3>
+                    <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+                        <div className="flex items-center gap-3">
+                            <kbd className="font-mono text-xs">I</kbd>
+                            <dt className="opacity-80">Toggle about panel</dt>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <kbd className="font-mono text-xs">Esc</kbd>
+                            <dt className="opacity-80">Close about panel</dt>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <kbd className="font-mono text-xs">Space</kbd>
+                            <dt className="opacity-80">Spawn random ripple</dt>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <kbd className="font-mono text-xs">R</kbd>
+                            <dt className="opacity-80">Spawn random ripple</dt>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <kbd className="font-mono text-xs">Tab</kbd>
+                            <dt className="opacity-80">Navigate links</dt>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <kbd className="font-mono text-xs">Click</kbd>
+                            <dt className="opacity-80">Ripple from cursor</dt>
+                        </div>
+                    </dl>
+                </section>
+
                 <section className="mt-12 pt-8 border-t border-white/10 pb-16">
                     <h3 className="uppercase text-xs tracking-[0.2em] opacity-60 mb-4">Elsewhere</h3>
                     <ul className="space-y-1.5 text-sm">
