@@ -142,6 +142,15 @@ const Page: FunctionComponent = () => {
     useEffect(() => {
         if (wasCalled.current) return;
         wasCalled.current = true;
+
+        // Respect reduced motion: set a static title and skip the animation.
+        const prefersReduced =
+            window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+        if (prefersReduced) {
+            document.title = 'Pankevich George — Software Engineer';
+            return;
+        }
+
         // eslint-disable-next-line no-console
         console.log(
             "\n\n%c %c Coded with \u2661 by appxpy ",
@@ -285,7 +294,7 @@ const Page: FunctionComponent = () => {
 
     return (
         <div
-            className="inset-0 fixed overflow-hidden"
+            className="inset-0 fixed overflow-hidden cursor-crosshair"
             onClick={handleClick}
             onPointerMove={handlePointerMove}
         >
