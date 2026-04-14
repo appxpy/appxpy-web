@@ -113,6 +113,21 @@ const Page: FunctionComponent = () => {
         setClickData({ x: nx, y: ny, time: Date.now() });
     }, [infoOpen]);
 
+    // Long-press anywhere (mobile) opens the About overlay
+    const longPressTimer = useRef<number | undefined>(undefined);
+    const handlePointerDown = useCallback((e: React.PointerEvent) => {
+        if (e.pointerType !== 'touch' || infoOpen) return;
+        longPressTimer.current = window.setTimeout(() => {
+            setInfoOpen(true);
+        }, 650);
+    }, [infoOpen]);
+    const cancelLongPress = useCallback(() => {
+        if (longPressTimer.current) {
+            window.clearTimeout(longPressTimer.current);
+            longPressTimer.current = undefined;
+        }
+    }, []);
+
     const openInfo = useCallback(() => setInfoOpen(true), []);
     const closeInfo = useCallback(() => setInfoOpen(false), []);
 
@@ -296,6 +311,10 @@ const Page: FunctionComponent = () => {
             className="inset-0 fixed overflow-hidden cursor-crosshair"
             onClick={handleClick}
             onPointerMove={handlePointerMove}
+            onPointerDown={handlePointerDown}
+            onPointerUp={cancelLongPress}
+            onPointerCancel={cancelLongPress}
+            onPointerLeave={cancelLongPress}
         >
             {webglSupported ? (
                 <Canvas
@@ -362,7 +381,13 @@ const Page: FunctionComponent = () => {
                 <div className="relative h-full w-full box-border flex flex-col justify-between" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
                     <div className="h-20 hidden absolute my-3 mx-6 top-0 right-0 sm:flex flex-col items-end justify-center">
                         <span className="uppercase font-normal text-lg text-end pointer-events-auto">→{year}</span>
-                        <span className="uppercase font-normal text-lg text-end pointer-events-auto">appxpy.com</span>
+                        <a
+                            href="/"
+                            aria-label="appxpy.com home"
+                            className="uppercase font-normal text-lg text-end pointer-events-auto relative after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[5.5px] after:right-0 hover:after:w-full focus-visible:outline-none focus-visible:after:w-full"
+                        >
+                            appxpy.com
+                        </a>
                     </div>
                     <div className="h-20 hidden absolute my-3 mx-6 bottom-0 right-0 sm:flex flex-col items-end justify-start">
                         <button
