@@ -1,0 +1,16 @@
+/* TEAM */
+
+Name: Pankevich George
+Alias: appxpy
+Role: Software Engineer (Go)
+Contact: me [at] appxpy.com
+Telegram: t.me/appxpy
+GitHub: github.com/appxpy
+Location: Moscow, Russia
+
+/* SITE */
+
+Last update: 2026
+Standards: HTML5, CSS3, TypeScript, WebGL (GLSL)
+Components: React, @react-three/fiber, Three.js
+Fonts: ABC Diatype, ABC Diatype Plus Variable
