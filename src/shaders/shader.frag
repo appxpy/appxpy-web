@@ -124,6 +124,10 @@ void main() {
     vec3 col = vec3(base);
     col += vec3(0.015, 0.01, 0.0) * smoothstep(0.3, 0.9, base);
 
+    // 8-bit anti-banding dither — randomised triangular noise, amplitude ~1/255
+    float dither = (hash12(gl_FragCoord.xy + mod(uTime, 1.0)) - 0.5) * (1.0 / 255.0);
+    col += dither;
+
     gl_FragColor.rgb = col;
     gl_FragColor.a = 1.0;
 }
