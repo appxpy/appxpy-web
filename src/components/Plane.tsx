@@ -107,19 +107,12 @@ const Plane: FunctionComponent<Props> = (props) => {
     }
   }, []);
 
+  // Keep iResolution uniform in sync with the current canvas dimensions.
   useEffect(() => {
-
-    const listener = () => {
-      ref.current!.material.uniforms.iResolution.value = [props.dimensions.width, props.dimensions.height]
-      ref.current!.material.needsUpdate = true
-    }
-
-    addEventListener("resize", listener)
-
-    return () => {
-      removeEventListener("resize", listener)
-    }
-  }, []);
+    const mat = ref.current?.material;
+    if (!mat) return;
+    mat.uniforms.iResolution.value = [props.dimensions.width, props.dimensions.height];
+  }, [props.dimensions.width, props.dimensions.height]);
 
   // Track prefers-reduced-motion live
   useEffect(() => {
