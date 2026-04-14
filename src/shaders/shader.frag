@@ -125,6 +125,18 @@ void main() {
     vec3 col = vec3(base);
     col += vec3(0.015, 0.01, 0.0) * smoothstep(0.3, 0.9, base);
 
+    // --- Twinkling stars, only in darker regions so they never fight the field ---
+    vec2 starUv = gl_FragCoord.xy * 0.003;
+    vec2 starCell = floor(starUv);
+    vec2 starF = fract(starUv);
+    float starSeed = hash12(starCell);
+    if (starSeed > 0.985) {
+        float star = smoothstep(0.05, 0.0, length(starF - 0.5));
+        float twinkle = 0.5 + 0.5 * sin(uTime * (1.5 + starSeed * 4.0) + starSeed * 10.0);
+        float mask = smoothstep(0.16, 0.02, base); // only in dark zones
+        col += vec3(star * twinkle * 0.35 * mask);
+    }
+
     // 8-bit anti-banding dither — randomised triangular noise, amplitude ~1/255
     float dither = (hash12(gl_FragCoord.xy + mod(uTime, 1.0)) - 0.5) * (1.0 / 255.0);
     col += dither;
