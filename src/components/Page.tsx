@@ -84,6 +84,7 @@ const Page: FunctionComponent = () => {
     const [infoOpen, setInfoOpen] = useState(false);
     const [introDone, setIntroDone] = useState(false);
     const [hintVisible, setHintVisible] = useState(false);
+    const [webglSupported, setWebglSupported] = useState<boolean>(true);
 
     const mousePosRef = useRef<[number, number]>([0.5, 0.5]);
     const wasCalled = useRef(false);
@@ -228,6 +229,17 @@ const Page: FunctionComponent = () => {
         };
     }, []);
 
+    // Detect WebGL availability so we can degrade gracefully
+    useEffect(() => {
+        try {
+            const canvas = document.createElement('canvas');
+            const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+            if (!gl) setWebglSupported(false);
+        } catch {
+            setWebglSupported(false);
+        }
+    }, []);
+
     const year = useMemo(() => new Date().getFullYear(), []);
 
     return (
@@ -236,29 +248,52 @@ const Page: FunctionComponent = () => {
             onClick={handleClick}
             onPointerMove={handlePointerMove}
         >
-            <Canvas
-                className={"fixed inset-0 w-full h-full overflow-hidden touch-auto"}
-                aria-hidden="true"
-                dpr={[1, reducedMotion ? 1.25 : 2]}
-                frameloop={reducedMotion ? 'demand' : 'always'}
-                gl={{
-                    antialias: true,
-                    toneMapping: ACESFilmicToneMapping,
-                    outputColorSpace: SRGBColorSpace,
-                    powerPreference: 'high-performance',
-                }}
-                orthographic
-                camera={{
-                    zoom: 1000,
-                    position: [0, 0, 5],
-                    top: dimensions.height / 2,
-                    bottom: dimensions.height / -2,
-                    left: dimensions.width / -2,
-                    right: dimensions.width / 2,
-                }}
-            >
-                <Scene dimensions={dimensions} clickData={clickData} mousePosRef={mousePosRef} />
-            </Canvas>
+            {webglSupported ? (
+                <Canvas
+                    className={"fixed inset-0 w-full h-full overflow-hidden touch-auto"}
+                    aria-hidden="true"
+                    dpr={[1, reducedMotion ? 1.25 : 2]}
+                    frameloop={reducedMotion ? 'demand' : 'always'}
+                    gl={{
+                        antialias: true,
+                        toneMapping: ACESFilmicToneMapping,
+                        outputColorSpace: SRGBColorSpace,
+                        powerPreference: 'high-performance',
+                    }}
+                    orthographic
+                    camera={{
+                        zoom: 1000,
+                        position: [0, 0, 5],
+                        top: dimensions.height / 2,
+                        bottom: dimensions.height / -2,
+                        left: dimensions.width / -2,
+                        right: dimensions.width / 2,
+                    }}
+                    onCreated={({ gl }) => {
+                        gl.domElement.addEventListener('webglcontextlost', (e) => {
+                            e.preventDefault();
+                            setWebglSupported(false);
+                        }, { once: true });
+                    }}
+                >
+                    <Scene dimensions={dimensions} clickData={clickData} mousePosRef={mousePosRef} />
+                </Canvas>
+            ) : (
+                <div
+                    aria-hidden="true"
+                    className="fixed inset-0 bg-[#0c0c0c] flex items-center justify-center pointer-events-none"
+                >
+                    <div className="absolute inset-0 opacity-60" style={{
+                        backgroundImage:
+                            'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.06), transparent 55%),' +
+                            'radial-gradient(circle at 70% 80%, rgba(255,255,255,0.04), transparent 60%)',
+                    }} />
+                    <div className="relative text-center select-none">
+                        <p className="text-4xl sm:text-6xl uppercase tracking-tight">Pankevich George</p>
+                        <p className="text-sm sm:text-base uppercase tracking-[0.3em] opacity-60 mt-3">Software Engineer</p>
+                    </div>
+                </div>
+            )}
 
             <a
                 href="#contact"

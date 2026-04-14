@@ -88,13 +88,31 @@ export const InfoOverlay: FunctionComponent<InfoOverlayProps> = ({ open, onClose
         };
     }, [open]);
 
-    // Esc to close
+    // Esc to close + focus trap
     useEffect(() => {
         if (!open) return;
         const onKey = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
                 e.preventDefault();
                 onClose();
+                return;
+            }
+            if (e.key !== 'Tab') return;
+            const panel = panelRef.current;
+            if (!panel) return;
+            const focusables = panel.querySelectorAll<HTMLElement>(
+                'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+            );
+            if (focusables.length === 0) return;
+            const first = focusables[0];
+            const last = focusables[focusables.length - 1];
+            const active = document.activeElement as HTMLElement | null;
+            if (e.shiftKey && active === first) {
+                e.preventDefault();
+                last.focus();
+            } else if (!e.shiftKey && active === last) {
+                e.preventDefault();
+                first.focus();
             }
         };
         window.addEventListener('keydown', onKey);
