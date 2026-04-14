@@ -310,7 +310,7 @@ const Page: FunctionComponent = () => {
                     introDone ? 'opacity-80' : 'opacity-0'
                 }`}
             >
-                <div className="relative h-full w-full box-border flex flex-col justify-between">
+                <div className="relative h-full w-full box-border flex flex-col justify-between" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
                     <div className="h-20 hidden absolute my-3 mx-6 top-0 right-0 sm:flex flex-col items-end justify-center">
                         <span className="uppercase font-normal text-lg text-end pointer-events-auto">→{year}</span>
                         <span className="uppercase font-normal text-lg text-end pointer-events-auto">appxpy.com</span>
@@ -326,11 +326,22 @@ const Page: FunctionComponent = () => {
                         </button>
                         <span className="uppercase font-normal text-xs opacity-50 text-end pointer-events-auto select-none">Press I</span>
                     </div>
+                    {/* Mobile-only About button so it's reachable without keyboard */}
+                    <div className="absolute top-0 right-0 my-6 mx-6 sm:hidden">
+                        <button
+                            type="button"
+                            onClick={openInfo}
+                            aria-label="Open about panel"
+                            className="relative uppercase font-normal text-sm text-end pointer-events-auto after:duration-300 after:bg-white after:w-0 after:h-[1.5px] after:absolute after:bottom-[3.5px] after:right-0 hover:after:w-full focus-visible:outline-none focus-visible:after:w-full"
+                        >
+                            About ↗
+                        </button>
+                    </div>
 
                     <nav
                         id="contact"
                         aria-label="Contact links"
-                        className="absolute my-6 sm:my-3 sm:mx-6 bottom-0 left-0 flex flex-col items-start justify-start z-20"
+                        className="absolute my-6 sm:my-3 sm:mx-6 bottom-10 sm:bottom-0 left-0 flex flex-col items-start justify-start z-20 max-w-[80vw]"
                     >
                         <a
                             href="mailto:me@appxpy.com"
