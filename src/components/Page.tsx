@@ -123,8 +123,9 @@ const Page: FunctionComponent = () => {
         ];
     }, []);
 
-    const handleEmailClick = useCallback(async (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const handleEmailClick = useCallback(async () => {
         // Best-effort copy to clipboard alongside the default mailto:
+        // We intentionally do NOT preventDefault so the mailto: still fires.
         try {
             if (navigator.clipboard?.writeText) {
                 await navigator.clipboard.writeText(LINKS.email);
@@ -134,8 +135,6 @@ const Page: FunctionComponent = () => {
         } catch {
             /* noop — mailto: still fires */
         }
-        // Do NOT preventDefault: let the mailto: happen too.
-        void e;
     }, []);
 
     // Title animation — properly cancellable; pauses when the tab is hidden
