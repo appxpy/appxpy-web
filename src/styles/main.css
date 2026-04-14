@@ -158,6 +158,7 @@
 html {
   overscroll-behavior: none;
   overflow: hidden;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -166,6 +167,47 @@ body {
   position: relative;
   background: #0c0c0c;
   color: white;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  touch-action: manipulation;
+}
+
+/* Only show a visible focus ring for keyboard users */
+:focus:not(:focus-visible) { outline: none; }
+:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Pretty keyboard chips used in the hint bar */
+kbd {
+  display: inline-block;
+  padding: 0 0.35em;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 0.85em;
+  line-height: 1.3;
+  letter-spacing: 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Custom subtle scrollbar inside the About overlay */
+.about-scroll::-webkit-scrollbar { width: 6px; }
+.about-scroll::-webkit-scrollbar-track { background: transparent; }
+.about-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
+.about-scroll::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* Respect user preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 .main {

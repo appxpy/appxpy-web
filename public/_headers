@@ -1,0 +1,48 @@
+# Cloudflare Pages / wrangler asset headers
+# Global security + sane defaults
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
+  X-XSS-Protection: 1; mode=block
+
+# Hashed bundle assets — immutable, cache forever
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Fonts — long cache, publicly cacheable, CORS-friendly for @font-face
+/*.woff2
+  Cache-Control: public, max-age=31536000, immutable
+  Access-Control-Allow-Origin: *
+
+/*.woff
+  Cache-Control: public, max-age=31536000, immutable
+  Access-Control-Allow-Origin: *
+
+# Three.js text atlases
+/*.json
+  Cache-Control: public, max-age=604800
+  Access-Control-Allow-Origin: *
+
+# Static metadata files
+/robots.txt
+  Cache-Control: public, max-age=86400
+
+/sitemap.xml
+  Cache-Control: public, max-age=86400
+
+/manifest.webmanifest
+  Cache-Control: public, max-age=86400
+  Content-Type: application/manifest+json
+
+/humans.txt
+  Cache-Control: public, max-age=86400
+
+# The CV can change — short cache with revalidation
+/resume.pdf
+  Cache-Control: public, max-age=3600, must-revalidate
+
+# OG preview — safe to cache a while
+/preview.png
+  Cache-Control: public, max-age=2592000
