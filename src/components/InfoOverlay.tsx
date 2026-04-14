@@ -146,7 +146,7 @@ export const InfoOverlay: FunctionComponent<InfoOverlayProps> = ({ open, onClose
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="info-title"
-                className={`about-scroll relative w-full sm:max-w-xl md:max-w-2xl h-full overflow-y-auto bg-[#0c0c0c] text-white border-l border-white/10 p-6 sm:p-10 transform transition-transform duration-500 ease-out ${
+                className={`about-scroll relative w-full sm:max-w-xl md:max-w-2xl h-full overflow-y-auto bg-ink text-white border-l border-white/10 p-6 sm:p-10 transform transition-transform duration-500 ease-out ${
                     open ? 'translate-x-0' : 'translate-x-full'
                 }`}
             >

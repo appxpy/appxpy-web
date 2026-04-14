@@ -349,7 +349,7 @@ const Page: FunctionComponent = () => {
             ) : (
                 <div
                     aria-hidden="true"
-                    className="fixed inset-0 bg-[#0c0c0c] flex items-center justify-center pointer-events-none"
+                    className="fixed inset-0 bg-ink flex items-center justify-center pointer-events-none"
                 >
                     <div className="absolute inset-0 opacity-60" style={{
                         backgroundImage:
