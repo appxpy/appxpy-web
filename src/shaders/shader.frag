@@ -117,21 +117,24 @@ void main() {
 
     // -------------------------------------------------------------------------
     // Contour lines — anti-aliased via fwidth
+    // Lower LEVELS_* means wider spacing between contours (fewer lines).
     // -------------------------------------------------------------------------
-    const float LEVELS_A = 7.0;
-    const float LEVELS_B = 14.0;
+    const float LEVELS_A = 4.5;
+    const float LEVELS_B = 9.0;
 
-    // Primary contours (softer edges so lines don't punch)
+    // Primary contours — wide AA so the edges feather out instead of punching
     float la = f * LEVELS_A;
     float da = min(fract(la), 1.0 - fract(la));
     float fwa = max(fwidth(la), 0.0001);
-    float lineA = 1.0 - smoothstep(0.0, fwa * 1.7, da);
+    float lineA = 1.0 - smoothstep(0.0, fwa * 2.4, da);
+    // Soft-shoulder the line intensity so the peak is gentler than a hard 1.0
+    lineA = pow(lineA, 1.35);
 
-    // Secondary finer contours — very subtle
+    // Secondary finer contours — barely-there ghost lines
     float lb = f * LEVELS_B;
     float db = min(fract(lb), 1.0 - fract(lb));
     float fwb = max(fwidth(lb), 0.0001);
-    float lineB = (1.0 - smoothstep(0.0, fwb * 1.1, db)) * 0.14;
+    float lineB = (1.0 - smoothstep(0.0, fwb * 1.6, db)) * 0.08;
 
     float lines = max(lineA, lineB);
 
@@ -141,10 +144,15 @@ void main() {
 
     // Ambient gradient wash so the page isn't pure black — gives the glass
     // refractions something to work with and prevents 8-bit banding.
-    float wash = 0.016 + 0.024 * smoothstep(-0.2, 1.2, f);
+    float wash = 0.018 + 0.022 * smoothstep(-0.2, 1.2, f);
 
-    // Lower contour weight so the lines recede into the background
-    float brightness = (lines * 0.52 + wash) * vignette;
+    // Dithered break-up: a faint per-pixel noise field subtly roughens the
+    // contour edges so they feel drawn rather than stamped.
+    float lineDither = hash12(vUv * iResolution.xy * 0.25 + mod(uTime * 0.3, 100.0));
+    lines *= 0.86 + 0.14 * lineDither;
+
+    // Lower contour weight — let the lines recede into the grain
+    float brightness = (lines * 0.4 + wash) * vignette;
 
     vec3 col = vec3(brightness);
 
@@ -153,13 +161,16 @@ void main() {
     col.g += brightness * 0.005;
 
     // --- Film grain ---------------------------------------------------------
-    // Per-pixel time-varying noise gives the image a tactile, filmic texture
-    // and masks any remaining banding. Two layers: a fine fast grain and a
-    // coarser slow grain so the surface doesn't feel sterile.
+    // Three-layer grain gives a tactile, filmic surface that keeps the eye
+    // from locking onto the contours. Fast fine grain masks banding, a
+    // medium-scale slow grain adds "paper texture", a coarse low-frequency
+    // wobble gives it a subtle cloud-of-dust depth.
     float grainFast = hash12(vUv * iResolution.xy + mod(uTime * 11.0, 100.0));
-    float grainSlow = hash12(floor(vUv * iResolution.xy * 0.5) + mod(uTime * 0.8, 100.0));
-    col += (grainFast - 0.5) * 0.032;
-    col += (grainSlow - 0.5) * 0.018;
+    float grainMed  = hash12(floor(vUv * iResolution.xy * 0.5) + mod(uTime * 0.8, 100.0));
+    float grainSlow = hash12(floor(vUv * iResolution.xy * 0.18) + mod(uTime * 0.35, 100.0));
+    col += (grainFast - 0.5) * 0.05;
+    col += (grainMed  - 0.5) * 0.032;
+    col += (grainSlow - 0.5) * 0.022;
 
     // 8-bit anti-banding dither (kept as a safety net)
     col += (hash12(vUv * iResolution.xy + mod(uTime, 1.0)) - 0.5) / 255.0;
