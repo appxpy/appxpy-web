@@ -27,7 +27,6 @@ const ROLES: Role[] = [
         title: 'Go Engineer',
         period: 'Nov 2023 — Nov 2025',
         highlights: [
-            'Led a feature team: decomposed work, ran planning, demoed results to stakeholders.',
             'Cut monolith response time ~20% by migrating every table from custom to native indexes — unblocked the microservices migration.',
             'Built a type-safe YDB query builder — 3× faster than Squirrel, adopted across teams.',
             'Designed two greenfield microservices end-to-end: domain boundaries, contracts, schemas, stack choice.',
@@ -173,7 +172,7 @@ export const InfoOverlay: FunctionComponent<InfoOverlayProps> = ({ open, onClose
 
                 <p className="text-base leading-relaxed opacity-90 max-w-lg">
                     I build high-throughput distributed systems in Go. Currently at VK on streaming
-                    replication for Kafka and YT (5M+ RPS); previously led backend work at Yandex on
+                    replication for Kafka and YT (5M+ RPS); previously at Yandex, working on
                     monolith-to-microservices migration, observability, and internal libraries.
                 </p>
 
