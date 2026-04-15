@@ -59,12 +59,17 @@ vec2 toUV(vec2 uv01) {
     return (uv01 - 0.5) * iResolution.xy / min(iResolution.x, iResolution.y);
 }
 
+// Ripple lifetime — must match the CPU-side pruning TTL in Plane.tsx
+// so that ripples fade to zero continuously before being removed.
+#define RIPPLE_LIFE 5.0
+
 // -----------------------------------------------------------------------------
 // Main
 // -----------------------------------------------------------------------------
 void main() {
     float motionScale = mix(1.0, 0.15, uReducedMotion);
-    float T = uTime * 0.06 * motionScale;
+    // Slower drift so the background doesn't pull the eye away from content
+    float T = uTime * 0.032 * motionScale;
 
     vec2 p = toUV(vUv) * 1.35;
     vec2 mouseP = toUV(uMouse);
@@ -83,27 +88,30 @@ void main() {
     // --- Cursor pulls the field up (local Gaussian bump) ---
     vec2 toMouse = p - mouseP;
     float mouseDist2 = dot(toMouse, toMouse);
-    float mouseBlob = exp(-mouseDist2 * 4.2) * 0.85;
+    float mouseBlob = exp(-mouseDist2 * 4.2) * 0.7;
     f += mouseBlob;
 
     // --- Click ripples: radial travelling waves ---
+    // Cubic ease-out to zero so the ripple fades smoothly into the background
+    // without a pop when the CPU drops it from the active list.
     for (int i = 0; i < MAX_RIPPLES; i++) {
         if (i >= uRippleCount) break;
         float elapsed = uTime - uClickTimes[i];
-        if (elapsed < 0.0 || elapsed > 3.5) continue;
+        if (elapsed < 0.0 || elapsed > RIPPLE_LIFE) continue;
 
-        float tt = clamp(elapsed / 3.5, 0.0, 1.0);
-        float fade = pow(1.0 - tt, 2.0) * smoothstep(0.0, 0.08, elapsed);
+        float tt = clamp(elapsed / RIPPLE_LIFE, 0.0, 1.0);
+        // Cubic tail + gentler ramp-in
+        float fade = pow(1.0 - tt, 3.0) * smoothstep(0.0, 0.12, elapsed);
 
         vec2 clickP = toUV(uClicks[i]);
         float r = distance(p, clickP);
 
-        // Radial sine wave that travels outward
-        float wave = sin(r * 16.0 - elapsed * 9.0) * exp(-r * 1.6);
-        f += wave * fade * 0.32;
+        // Slower radial sine wave, tighter decay so it doesn't dominate
+        float wave = sin(r * 13.0 - elapsed * 5.5) * exp(-r * 1.5);
+        f += wave * fade * 0.26;
 
         // Small Gaussian bump at the click origin so the first frame pops
-        float bump = exp(-r * r * 10.0) * (1.0 - tt) * 0.4;
+        float bump = exp(-r * r * 10.0) * pow(1.0 - tt, 2.0) * 0.32;
         f += bump;
     }
 
@@ -113,29 +121,30 @@ void main() {
     const float LEVELS_A = 7.0;
     const float LEVELS_B = 14.0;
 
-    // Primary contours (thicker)
+    // Primary contours (softer edges so lines don't punch)
     float la = f * LEVELS_A;
     float da = min(fract(la), 1.0 - fract(la));
     float fwa = max(fwidth(la), 0.0001);
-    float lineA = 1.0 - smoothstep(0.0, fwa * 1.4, da);
+    float lineA = 1.0 - smoothstep(0.0, fwa * 1.7, da);
 
-    // Secondary finer contours — subtle
+    // Secondary finer contours — very subtle
     float lb = f * LEVELS_B;
     float db = min(fract(lb), 1.0 - fract(lb));
     float fwb = max(fwidth(lb), 0.0001);
-    float lineB = (1.0 - smoothstep(0.0, fwb * 0.9, db)) * 0.22;
+    float lineB = (1.0 - smoothstep(0.0, fwb * 1.1, db)) * 0.14;
 
     float lines = max(lineA, lineB);
 
     // Soft vignette so corners are deeper than the centre
     vec2 ndc = vUv * 2.0 - 1.0;
-    float vignette = 1.0 - dot(ndc, ndc) * 0.28;
+    float vignette = 1.0 - dot(ndc, ndc) * 0.32;
 
     // Ambient gradient wash so the page isn't pure black — gives the glass
     // refractions something to work with and prevents 8-bit banding.
-    float wash = 0.02 + 0.035 * smoothstep(-0.2, 1.2, f);
+    float wash = 0.016 + 0.024 * smoothstep(-0.2, 1.2, f);
 
-    float brightness = (lines * 0.78 + wash) * vignette;
+    // Lower contour weight so the lines recede into the background
+    float brightness = (lines * 0.52 + wash) * vignette;
 
     vec3 col = vec3(brightness);
 
@@ -143,7 +152,16 @@ void main() {
     col.r += brightness * 0.015;
     col.g += brightness * 0.005;
 
-    // 8-bit anti-banding dither
+    // --- Film grain ---------------------------------------------------------
+    // Per-pixel time-varying noise gives the image a tactile, filmic texture
+    // and masks any remaining banding. Two layers: a fine fast grain and a
+    // coarser slow grain so the surface doesn't feel sterile.
+    float grainFast = hash12(vUv * iResolution.xy + mod(uTime * 11.0, 100.0));
+    float grainSlow = hash12(floor(vUv * iResolution.xy * 0.5) + mod(uTime * 0.8, 100.0));
+    col += (grainFast - 0.5) * 0.032;
+    col += (grainSlow - 0.5) * 0.018;
+
+    // 8-bit anti-banding dither (kept as a safety net)
     col += (hash12(vUv * iResolution.xy + mod(uTime, 1.0)) - 0.5) / 255.0;
 
     gl_FragColor = vec4(col, 1.0);

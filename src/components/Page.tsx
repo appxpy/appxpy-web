@@ -14,12 +14,33 @@ const LINKS = {
     cv: '/resume.pdf',
 } as const;
 
-// Shared "animated underline" link style used by the footer nav
-const navLinkClass =
-    "relative uppercase font-normal text-[0.9rem] sm:text-lg text-start hover:cursor-pointer " +
-    "after:duration-300 after:bg-white after:w-0 after:h-[1.5px] " +
-    "after:absolute after:bottom-[5.5px] after:left-0 hover:after:w-full " +
-    "pointer-events-auto focus-visible:outline-none focus-visible:after:w-full";
+// Contact nav link — the anchor itself is the hitbox (block + vertical
+// padding so adjacent links touch and the cursor never re-enters empty
+// space between rows). The animated underline lives on an inner <span>
+// so padding can't push it off the text baseline.
+const NavLink: FunctionComponent<
+    React.AnchorHTMLAttributes<HTMLAnchorElement> & { children: React.ReactNode }
+> = ({ children, className = '', ...rest }) => (
+    <a
+        {...rest}
+        className={
+            "group block py-1 pointer-events-auto hover:cursor-pointer " +
+            "focus-visible:outline-none " +
+            className
+        }
+    >
+        <span
+            className={
+                "relative inline-block uppercase font-normal text-[0.9rem] sm:text-lg leading-[1.35] " +
+                "after:duration-300 after:bg-white after:w-0 after:h-[1.5px] " +
+                "after:absolute after:bottom-[3px] after:left-0 " +
+                "group-hover:after:w-full group-focus-visible:after:w-full"
+            }
+        >
+            {children}
+        </span>
+    </a>
+);
 
 const TITLE_FRAMES: { s: string, delay?: number, replace?: boolean }[] = [
     { s: "Pankevich\u205fGeorge", replace: true },
@@ -446,17 +467,22 @@ const Page: FunctionComponent = () => {
                     {/* Flexible spacer: fills the middle so nav/footer hug the bottom */}
                     <div className="flex-1 min-h-[2rem]" />
 
-                    {/* Contact nav */}
+                    {/*
+                      Contact nav.
+                      On desktop it's absolutely anchored to the bottom-left so
+                      its last link (github) shares a bottom baseline with the
+                      About block (bottom-right) and the copyright footer
+                      (bottom-center). On mobile it stays in the flex flow.
+                    */}
                     <nav
                         id="contact"
                         aria-label="Contact links"
-                        className="flex flex-col items-start shrink-0 max-w-[85vw]"
+                        className="flex flex-col items-start shrink-0 max-w-[85vw] sm:absolute sm:left-0 sm:bottom-0 sm:-mb-1"
                     >
-                        <a
+                        <NavLink
                             href={`mailto:${LINKS.email}`}
                             onClick={handleEmailClick}
                             aria-label={`Email me at ${LINKS.email} (click to also copy)`}
-                            className={navLinkClass}
                         >
                             ↗ mail: {LINKS.email}
                             <span
@@ -465,29 +491,27 @@ const Page: FunctionComponent = () => {
                             >
                                 (copied)
                             </span>
-                        </a>
-                        <a
+                        </NavLink>
+                        <NavLink
                             href={LINKS.telegram}
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="Telegram @appxpy"
-                            className={navLinkClass}
                         >
                             ↗ telegram: @appxpy
-                        </a>
-                        <a
+                        </NavLink>
+                        <NavLink
                             href={LINKS.github}
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="GitHub @appxpy"
-                            className={navLinkClass}
                         >
                             ↗ github: @appxpy
-                        </a>
+                        </NavLink>
                     </nav>
 
                     {/* Footer */}
-                    <footer className="w-full flex flex-col items-center justify-center gap-1 shrink-0 mt-3 sm:mt-4">
+                    <footer className="w-full flex flex-col items-center justify-center gap-1 shrink-0 mt-3 sm:mt-0">
                         <span className="uppercase font-normal text-xs sm:text-sm md:text-base opacity-70 text-center pointer-events-auto">
                             © Pankevich George, {year}
                         </span>

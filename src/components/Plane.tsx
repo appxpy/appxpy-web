@@ -1,3 +1,11 @@
+// Background fragment shader.
+// Drop-in variants live in `../shaders/variants/*.frag` — each accepts the
+// same uniform set, so swapping is a one-line change here:
+//   import fragment from '../shaders/variants/gradient.frag'     // soft FBM cloud
+//   import fragment from '../shaders/variants/interference.frag' // moiré grids
+//   import fragment from '../shaders/variants/flowstreaks.frag'  // curl-flow streaks
+//   import fragment from '../shaders/variants/voronoi.frag'      // drifting voronoi cells
+//   import fragment from '../shaders/variants/rings.frag'        // breathing concentric rings
 import fragment from '../shaders/shader.frag'
 import vertex from '../shaders/shader.vert'
 import React, { FunctionComponent, useEffect, useMemo, useRef } from "react";
@@ -51,11 +59,15 @@ const Plane: FunctionComponent<Props> = (props) => {
       }
     }
 
-    // Prune expired ripples in place
+    // Prune expired ripples in place.
+    // IMPORTANT: must match `RIPPLE_LIFE` in shader.frag so the ripple's
+    // shader-side fade reaches zero before it disappears from the uniform
+    // array — otherwise the background visibly pops when the ripple is
+    // dropped while still contributing to the field.
     const all = ripplesRef.current;
     let write = 0;
     for (let i = 0; i < all.length; i++) {
-      if (now - all[i].startTime <= 2.8) {
+      if (now - all[i].startTime <= 5.0) {
         all[write++] = all[i];
       }
     }
