@@ -4,7 +4,7 @@ import { Dimensions } from "../main";
 import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
 import Scene from "../Scene";
 import { Canvas } from "@react-three/fiber";
-import { ClickData } from "./Plane";
+import { ClickData, SHADER_KEYS, ShaderKey } from "./Plane";
 import InfoOverlay from "./InfoOverlay";
 
 const LINKS = {
@@ -14,12 +14,33 @@ const LINKS = {
     cv: '/resume.pdf',
 } as const;
 
-// Shared "animated underline" link style used by the footer nav
-const navLinkClass =
-    "relative uppercase font-normal text-[0.9rem] sm:text-lg text-start hover:cursor-pointer " +
-    "after:duration-300 after:bg-white after:w-0 after:h-[1.5px] " +
-    "after:absolute after:bottom-[5.5px] after:left-0 hover:after:w-full " +
-    "pointer-events-auto focus-visible:outline-none focus-visible:after:w-full";
+// Contact nav link — the anchor itself is the hitbox (block + vertical
+// padding so adjacent links touch and the cursor never re-enters empty
+// space between rows). The animated underline lives on an inner <span>
+// so padding can't push it off the text baseline.
+const NavLink: FunctionComponent<
+    React.AnchorHTMLAttributes<HTMLAnchorElement> & { children: React.ReactNode }
+> = ({ children, className = '', ...rest }) => (
+    <a
+        {...rest}
+        className={
+            "group block py-1 pointer-events-auto hover:cursor-pointer " +
+            "focus-visible:outline-none " +
+            className
+        }
+    >
+        <span
+            className={
+                "relative inline-block uppercase font-normal text-[0.9rem] sm:text-lg leading-[1.35] " +
+                "after:duration-300 after:bg-white after:w-0 after:h-[1.5px] " +
+                "after:absolute after:bottom-[3px] after:left-0 " +
+                "group-hover:after:w-full group-focus-visible:after:w-full"
+            }
+        >
+            {children}
+        </span>
+    </a>
+);
 
 const TITLE_FRAMES: { s: string, delay?: number, replace?: boolean }[] = [
     { s: "Pankevich\u205fGeorge", replace: true },
@@ -101,6 +122,9 @@ const Page: FunctionComponent = () => {
     const [documentVisible, setDocumentVisible] = useState<boolean>(() =>
         typeof document === 'undefined' ? true : !document.hidden
     );
+    // TEMP — background shader picker. Remove once a variant is chosen.
+    const [shaderIdx, setShaderIdx] = useState<number>(0);
+    const shader: ShaderKey = SHADER_KEYS[shaderIdx] ?? 'contours';
 
     const mousePosRef = useRef<[number, number]>([0.5, 0.5]);
     const wasCalled = useRef(false);
@@ -330,7 +354,7 @@ const Page: FunctionComponent = () => {
                         }, { once: true });
                     }}
                 >
-                    <Scene dimensions={dimensions} clickData={clickData} mousePosRef={mousePosRef} />
+                    <Scene dimensions={dimensions} clickData={clickData} mousePosRef={mousePosRef} shader={shader} />
                 </Canvas>
             ) : (
                 <div
@@ -355,6 +379,39 @@ const Page: FunctionComponent = () => {
             >
                 Skip to contact
             </a>
+
+            {/*
+              TEMP — background shader picker.
+              Remove once a variant has been chosen. stopPropagation on
+              pointer events so interacting with the slider doesn't also
+              spawn a ripple on the underlying click handler.
+            */}
+            <div
+                className="fixed top-3 left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-3 z-50 pointer-events-auto flex flex-col items-start gap-1 rounded-md border border-white/15 bg-black/55 px-3 py-2 backdrop-blur-sm select-none"
+                onClick={(e) => e.stopPropagation()}
+                onPointerDown={(e) => e.stopPropagation()}
+            >
+                <label
+                    htmlFor="shader-picker"
+                    className="uppercase text-[10px] tracking-[0.2em] opacity-70 flex items-center gap-2"
+                >
+                    <span>Shader</span>
+                    <span className="opacity-90 normal-case tracking-normal font-mono text-[11px]">
+                        {shaderIdx + 1}/{SHADER_KEYS.length} · {shader}
+                    </span>
+                </label>
+                <input
+                    id="shader-picker"
+                    type="range"
+                    min={0}
+                    max={SHADER_KEYS.length - 1}
+                    step={1}
+                    value={shaderIdx}
+                    onChange={(e) => setShaderIdx(Number(e.currentTarget.value))}
+                    aria-label="Background shader"
+                    className="w-48 accent-white cursor-pointer"
+                />
+            </div>
 
             <main
                 id="main"
@@ -446,17 +503,22 @@ const Page: FunctionComponent = () => {
                     {/* Flexible spacer: fills the middle so nav/footer hug the bottom */}
                     <div className="flex-1 min-h-[2rem]" />
 
-                    {/* Contact nav */}
+                    {/*
+                      Contact nav.
+                      On desktop it's absolutely anchored to the bottom-left so
+                      its last link (github) shares a bottom baseline with the
+                      About block (bottom-right) and the copyright footer
+                      (bottom-center). On mobile it stays in the flex flow.
+                    */}
                     <nav
                         id="contact"
                         aria-label="Contact links"
-                        className="flex flex-col items-start shrink-0 max-w-[85vw]"
+                        className="flex flex-col items-start shrink-0 max-w-[85vw] sm:absolute sm:left-0 sm:bottom-0 sm:-mb-1"
                     >
-                        <a
+                        <NavLink
                             href={`mailto:${LINKS.email}`}
                             onClick={handleEmailClick}
                             aria-label={`Email me at ${LINKS.email} (click to also copy)`}
-                            className={navLinkClass}
                         >
                             ↗ mail: {LINKS.email}
                             <span
@@ -465,29 +527,27 @@ const Page: FunctionComponent = () => {
                             >
                                 (copied)
                             </span>
-                        </a>
-                        <a
+                        </NavLink>
+                        <NavLink
                             href={LINKS.telegram}
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="Telegram @appxpy"
-                            className={navLinkClass}
                         >
                             ↗ telegram: @appxpy
-                        </a>
-                        <a
+                        </NavLink>
+                        <NavLink
                             href={LINKS.github}
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="GitHub @appxpy"
-                            className={navLinkClass}
                         >
                             ↗ github: @appxpy
-                        </a>
+                        </NavLink>
                     </nav>
 
                     {/* Footer */}
-                    <footer className="w-full flex flex-col items-center justify-center gap-1 shrink-0 mt-3 sm:mt-4">
+                    <footer className="w-full flex flex-col items-center justify-center gap-1 shrink-0 mt-3 sm:mt-0">
                         <span className="uppercase font-normal text-xs sm:text-sm md:text-base opacity-70 text-center pointer-events-auto">
                             © Pankevich George, {year}
                         </span>

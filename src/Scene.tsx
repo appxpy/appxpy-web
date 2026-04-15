@@ -1,5 +1,5 @@
 import Plane from './components/Plane'
-import { ClickData } from './components/Plane'
+import { ClickData, ShaderKey } from './components/Plane'
 
 import React, { FunctionComponent, useEffect } from 'react';
 import { useThree } from '@react-three/fiber';
@@ -10,6 +10,7 @@ interface SceneProps {
     dimensions: Dimensions;
     clickData: ClickData | null;
     mousePosRef: React.MutableRefObject<[number, number]>;
+    shader: ShaderKey;
 }
 
 // Keeps the orthographic camera frustum in sync with viewport dimensions.
@@ -37,7 +38,12 @@ const Scene: FunctionComponent<SceneProps> = (props) => {
     return (
         <>
             <CameraController dimensions={props.dimensions} />
-            <Plane dimensions={props.dimensions} clickData={props.clickData} mousePosRef={props.mousePosRef} />
+            <Plane
+                dimensions={props.dimensions}
+                clickData={props.clickData}
+                mousePosRef={props.mousePosRef}
+                shader={props.shader}
+            />
             <ambientLight intensity={0.1} />
             <spotLight
                 position={[0, 0.5, 1]}
