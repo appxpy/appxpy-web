@@ -1,18 +1,39 @@
 // Background fragment shader.
-// Drop-in variants live in `../shaders/variants/*.frag` — each accepts the
-// same uniform set, so swapping is a one-line change here:
-//   import fragment from '../shaders/variants/gradient.frag'     // soft FBM cloud
-//   import fragment from '../shaders/variants/interference.frag' // moiré grids
-//   import fragment from '../shaders/variants/flowstreaks.frag'  // curl-flow streaks
-//   import fragment from '../shaders/variants/voronoi.frag'      // drifting voronoi cells
-//   import fragment from '../shaders/variants/rings.frag'        // breathing concentric rings
-import fragment from '../shaders/shader.frag'
+// The main shader is `shader.frag` (flowing contour lines). Drop-in
+// variants live in `../shaders/variants/*.frag` — each accepts the same
+// uniform set, so the active one can be chosen at runtime via the
+// `shader` prop below. Selector UI lives in Page.tsx.
+import contoursFrag from '../shaders/shader.frag'
+import gradientFrag from '../shaders/variants/gradient.frag'
+import interferenceFrag from '../shaders/variants/interference.frag'
+import flowstreaksFrag from '../shaders/variants/flowstreaks.frag'
+import voronoiFrag from '../shaders/variants/voronoi.frag'
+import ringsFrag from '../shaders/variants/rings.frag'
 import vertex from '../shaders/shader.vert'
 import React, { FunctionComponent, useEffect, useMemo, useRef } from "react";
 import { useFrame } from '@react-three/fiber';
 import { Mesh, PlaneGeometry, ShaderMaterial, Vector2 } from "three";
 import { Dimensions } from "../main";
 import { TextGroup } from "./TextGroup";
+
+export const SHADER_KEYS = [
+  'contours',
+  'gradient',
+  'interference',
+  'flowstreaks',
+  'voronoi',
+  'rings',
+] as const;
+export type ShaderKey = typeof SHADER_KEYS[number];
+
+const SHADER_SOURCES: Record<ShaderKey, string> = {
+  contours: contoursFrag,
+  gradient: gradientFrag,
+  interference: interferenceFrag,
+  flowstreaks: flowstreaksFrag,
+  voronoi: voronoiFrag,
+  rings: ringsFrag,
+};
 
 export interface ClickData {
   x: number;
@@ -24,6 +45,7 @@ interface PlaneProps {
   dimensions: Dimensions;
   clickData: ClickData | null;
   mousePosRef: React.MutableRefObject<[number, number]>;
+  shader: ShaderKey;
 }
 
 type Props = PlaneProps;
@@ -141,6 +163,8 @@ const Plane: FunctionComponent<Props> = (props) => {
     return () => mq.removeEventListener?.('change', update);
   }, []);
 
+  const fragment = SHADER_SOURCES[props.shader];
+
   return (
     <>
       <mesh
@@ -150,12 +174,23 @@ const Plane: FunctionComponent<Props> = (props) => {
         receiveShadow={false}
       >
         <planeGeometry />
-        <shaderMaterial vertexShader={vertex} fragmentShader={fragment} uniforms={uniforms} transparent={true} />
+        {/*
+          `key` forces three.js to build a fresh ShaderMaterial when the
+          user picks a different shader — ShaderMaterial doesn't allow
+          hot-swapping its fragment source after compile. The `uniforms`
+          object is shared by reference (three.js shallow-copies it), so
+          uTime / uMouse / ripple state carry over seamlessly.
+        */}
+        <shaderMaterial
+          key={props.shader}
+          vertexShader={vertex}
+          fragmentShader={fragment}
+          uniforms={uniforms}
+          transparent={true}
+        />
       </mesh>
       <TextGroup dimensions={props.dimensions} />
     </>
-
-
   )
 };
 

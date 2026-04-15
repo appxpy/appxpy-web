@@ -4,7 +4,7 @@ import { Dimensions } from "../main";
 import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
 import Scene from "../Scene";
 import { Canvas } from "@react-three/fiber";
-import { ClickData } from "./Plane";
+import { ClickData, SHADER_KEYS, ShaderKey } from "./Plane";
 import InfoOverlay from "./InfoOverlay";
 
 const LINKS = {
@@ -122,6 +122,9 @@ const Page: FunctionComponent = () => {
     const [documentVisible, setDocumentVisible] = useState<boolean>(() =>
         typeof document === 'undefined' ? true : !document.hidden
     );
+    // TEMP — background shader picker. Remove once a variant is chosen.
+    const [shaderIdx, setShaderIdx] = useState<number>(0);
+    const shader: ShaderKey = SHADER_KEYS[shaderIdx] ?? 'contours';
 
     const mousePosRef = useRef<[number, number]>([0.5, 0.5]);
     const wasCalled = useRef(false);
@@ -351,7 +354,7 @@ const Page: FunctionComponent = () => {
                         }, { once: true });
                     }}
                 >
-                    <Scene dimensions={dimensions} clickData={clickData} mousePosRef={mousePosRef} />
+                    <Scene dimensions={dimensions} clickData={clickData} mousePosRef={mousePosRef} shader={shader} />
                 </Canvas>
             ) : (
                 <div
@@ -376,6 +379,39 @@ const Page: FunctionComponent = () => {
             >
                 Skip to contact
             </a>
+
+            {/*
+              TEMP — background shader picker.
+              Remove once a variant has been chosen. stopPropagation on
+              pointer events so interacting with the slider doesn't also
+              spawn a ripple on the underlying click handler.
+            */}
+            <div
+                className="fixed top-3 left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-3 z-50 pointer-events-auto flex flex-col items-start gap-1 rounded-md border border-white/15 bg-black/55 px-3 py-2 backdrop-blur-sm select-none"
+                onClick={(e) => e.stopPropagation()}
+                onPointerDown={(e) => e.stopPropagation()}
+            >
+                <label
+                    htmlFor="shader-picker"
+                    className="uppercase text-[10px] tracking-[0.2em] opacity-70 flex items-center gap-2"
+                >
+                    <span>Shader</span>
+                    <span className="opacity-90 normal-case tracking-normal font-mono text-[11px]">
+                        {shaderIdx + 1}/{SHADER_KEYS.length} · {shader}
+                    </span>
+                </label>
+                <input
+                    id="shader-picker"
+                    type="range"
+                    min={0}
+                    max={SHADER_KEYS.length - 1}
+                    step={1}
+                    value={shaderIdx}
+                    onChange={(e) => setShaderIdx(Number(e.currentTarget.value))}
+                    aria-label="Background shader"
+                    className="w-48 accent-white cursor-pointer"
+                />
+            </div>
 
             <main
                 id="main"
